@@ -7,14 +7,56 @@ import numpy as np
 vid_path = "./terrace1-c0.avi"
 vidcap = cv2.VideoCapture(vid_path)
 
-success,image = vidcap.read()
+(success, frame) = vidcap.read()
+
+(img_h, img_w) = (None, None)
 
 count = 0
 while count < 1000:
-    success,image = vidcap.read()
+    (success, frame) = vidcap.read()
+    (img_h, img_w) = frame.shape[:2]
     count += 1
     print(count)
-    cv2.imshow('frame', image)
-    cv2.waitKey(1)
+    # cv2.imshow('frame', frame)
+    # cv2.waitKey(1)
 
 print('Done')
+
+cv2.imshow('frame', frame)
+cv2.waitKey()
+
+confid = 0.5
+thresh = 0.5
+
+wgt_path = "./yolov4.weights"
+cfg_path = "./yolov4.cfg"
+
+net = cv2.dnn.readNetFromDarknet(cfg_path, wgt_path)
+ln = net.getLayerNames()
+
+blob = cv2.dnn.blobFromImage(frame, 1 / 255.0, (416, 416), swapRB=True, crop=False)
+
+net.setInput(blob)
+start = time.time()
+layerOutputs = net.forward(ln)
+end = time.time()
+
+boxes = []
+confidences = []
+classIDs = []
+
+for output in layerOutputs:
+    scores = detection[5:]
+    classID = np.argmax(scores)
+    confidence = scores[classID]
+    if LABELS[classID] == "person":
+        if confidence > confid:
+            box = detection[0:4] * np.array([img_w, img_h, img_w, img_h])
+            (centerX, centerY, width, height) = box.astype("int")
+            x = int(centerX - (width / 2))
+            y = int(centerY - (height / 2))
+            boxes.append([x, y, int(width), int(height)])
+            confidences.append(float(confidence))
+            classIDs.append(classID)
+
+print(box)
