@@ -78,21 +78,21 @@ if len(idxs) > 0:
     idf = idxs.flatten()
     close_pair = []
     s_close_pair = []
-    center = []
+    centers = []
     co_info = []
 
     for i in idf:
 
         (x, y) = (boxes[i][0], boxes[i][1])
         (w, h) = (boxes[i][2], boxes[i][3])
-        cen = [int(x + w / 2), int(y + h / 2)]
-        center.append(cen)
-        cv2.circle(frame, tuple(cen),1,(0,0,0),1)
-        co_info.append([w, h, cen])
+        center = [int(x + w / 2), int(y + h / 2)]
+        centers.append(center)
+        cv2.circle(frame, tuple(center),1,(0,0,0),1)
+        co_info.append([w, h, center])
         
         status.append(0)
 
-print(center)
+print(centers)
 
 print(x,y,h,w)
 
