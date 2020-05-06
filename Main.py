@@ -4,8 +4,8 @@ import numpy as np
 
 # time.sleep(5)
 
-vid_path = "./terrace1-c0.avi"
-# vid_path = "./video.mp4"
+vid_path = "./Videos/terrace1-c0.avi"
+# vid_path = "./Videos/video.mp4"
 
 # vid = vid_path
 
@@ -16,7 +16,7 @@ vid_path = "./terrace1-c0.avi"
 ##########################
 
 clip_start = 800
-clip_end = 1000
+clip_end = 810
 
 frame_count = 0
 
@@ -28,7 +28,10 @@ vid_cap = cv2.VideoCapture(vid_path)
 
 while(True):
 
-    print('frame_count=',frame_count)
+    print('')
+    print('...')
+    print('')
+    print('frame_count =',frame_count)
 
     if frame_count >= clip_start and frame_count <= clip_end:
 
@@ -40,15 +43,15 @@ while(True):
 
         print('CP1')
 
-        cv2.imshow('Frame', frame)
-        cv2.waitKey(1)
+        # cv2.imshow('Frame', frame)
+        # cv2.waitKey(1)
 
         confid = 0.5
         thresh = 0.5
 
-        wgt_path = "./yolov3.weights"
-        cfg_path = "./yolov3.cfg"
-        labelsPath = "./coco.names"
+        wgt_path = "./Yolo/yolov3.weights"
+        cfg_path = "./Yolo/yolov3.cfg"
+        labelsPath = "./Yolo/coco.names"
 
         net = cv2.dnn.readNetFromDarknet(cfg_path, wgt_path)
         ln = net.getLayerNames()
@@ -58,8 +61,8 @@ while(True):
         frame_resized = cv2.resize(frame, (416, 416))
         blob = cv2.dnn.blobFromImage(frame_resized, 1 / 255.0, (416, 416), swapRB=True, crop=False)         # Scale image by dividing by 255. YoloV3 needs input size (416, 416)
         blobb = blob.reshape(blob.shape[2],blob.shape[3],3)
-        cv2.imshow('Blob', blobb)
-        cv2.waitKey(1)
+        # cv2.imshow('Blob', blobb)
+        # cv2.waitKey(2)
 
         net.setInput(blob)
         start = time.time()
@@ -86,15 +89,11 @@ while(True):
                         classIDs.append(classID)
         idxs = cv2.dnn.NMSBoxes(boxes, confidences, confid, thresh)
 
-        print(idxs)
-        print(confidences)
-
         print('CP2')
 
         if len(idxs) > 0:
             status = []
             idf = idxs.flatten()
-            print('idf =', idf)
             close_pair = []
             s_close_pair = []
             centers = []
@@ -119,24 +118,20 @@ while(True):
                 
                 status.append(0)
 
-            print(centers)
-            print(X)
-            print(Y)
-
-            ilist = []
-            i = 0
+            print('Centers =',centers)
 
             for i in range(0,len(idf)):
-                ilist.append(i)
-                print(i)
                 cv2.rectangle(frame, (X[i], Y[i]), (X[i] + W[i], Y[i] + H[i]), (0, 0, 150), 2)
-            cv2.imshow('Social distancing analyser', frame)
+            cv2.imshow('Person recognition', frame)
             cv2.waitKey(1)
 
 
         print('CP3')
 
-    else:
+    elif frame_count <= clip_end:
         (success, frame) = vid_cap.read()
+
+    else:
+        break
 
     frame_count += 1
