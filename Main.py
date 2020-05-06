@@ -4,7 +4,7 @@ import numpy as np
 
 # time.sleep(5)
 
-vid_path = "./terrace1-c0.avi"
+vid_path = "./video.mp4"
 vidcap = cv2.VideoCapture(vid_path)
 
 (success, frame) = vidcap.read()
@@ -12,7 +12,7 @@ vidcap = cv2.VideoCapture(vid_path)
 (img_h, img_w) = (None, None)
 
 count = 0
-while count < 1000:
+while count < 500:
     (success, frame) = vidcap.read()
     (img_h, img_w) = frame.shape[:2]
     count += 1
@@ -22,35 +22,43 @@ while count < 1000:
 
 print('Done')
 
-cv2.imshow('frame', frame)
+cv2.imshow('Frame', frame)
 cv2.waitKey(2000)
 
 confid = 0.5
 thresh = 0.5
 
-wgt_path = "./yolov4.weights"
-cfg_path = "./yolov4.cfg"
+wgt_path = "./yolov3.weights"
+cfg_path = "./yolov3.cfg"
 labelsPath = "./coco.names"
 
 net = cv2.dnn.readNetFromDarknet(cfg_path, wgt_path)
 ln = net.getLayerNames()
+ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+print(ln)
 labels = open(labelsPath).read().strip().split("\n")
 
-blob = cv2.dnn.blobFromImage(frame, 1 / 255.0, (416, 416), swapRB=True, crop=False)
+frame_resized = cv2.resize(frame, (416, 416))
+blob = cv2.dnn.blobFromImage(frame_resized, 1 / 255.0, (416, 416), swapRB=True, crop=False)         # Scale image by dividing by 255. YoloV3 needs input size (416, 416)
+print(blob)
+print(blob.shape)
+blobb = blob.reshape(blob.shape[2],blob.shape[3],3)
+print(blobb.shape)
+cv2.imshow('Blob', blobb)
+cv2.waitKey(20000)
 
 net.setInput(blob)
 start = time.time()
 layerOutputs = net.forward(ln)
 end = time.time()
 
+print(layerOutputs)
+
 boxes = []
 confidences = []
 classIDs = []
 
-print(boxes)
-
 for output in layerOutputs:
-    print(output)
     for detection in output:
         scores = detection[5:]
         classID = np.argmax(scores)
@@ -65,5 +73,4 @@ for output in layerOutputs:
                 confidences.append(float(confidence))
                 classIDs.append(classID)
 
-print(box)
 print('Done_2')
