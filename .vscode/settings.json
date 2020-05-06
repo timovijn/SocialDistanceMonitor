@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/Users/timovijn/opt/anaconda3/envs/timo/bin/python",
+    "python.pythonPath": "/Users/timovijn/opt/miniconda3/envs/timo/bin/python",
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true
 }
