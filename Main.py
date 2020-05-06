@@ -8,12 +8,7 @@ import numpy as np
 from datetime import datetime
 start_time = datetime.now()
 
-print('')
-print('...')
-print('')
-print('Started at', start_time.strftime("%H:%M:%S"))
-
-# time.sleep(5)
+print(''), print('...'), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
 
 # vid_path = "./Videos/terrace1-c0.avi"
 vid_path = "./Videos/video.mp4"
@@ -28,14 +23,11 @@ vid_path = "./Videos/video.mp4"
 
 vid_cap = cv2.VideoCapture(vid_path)
 vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
-print(vid_fps)
 
-# (success, frame) = vid_cap.read()
+print(''), print('...'), print(''), print('Path: {}'.format(vid_path)), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
 
-clip_start = int(20 * vid_fps)
-clip_end = int(20.5 * vid_fps)
-
-# frame_count = 0
+clip_start = int(10 * vid_fps)
+clip_end = int(10.5 * vid_fps)
 
 for frame_count in range(clip_start, clip_end + 1):
 
@@ -46,21 +38,11 @@ for frame_count in range(clip_start, clip_end + 1):
     print('...')
     print('')
 
-    print('Frame count:', frame_count)
-
-# if frame_count >= clip_start and frame_count <= clip_end:
+    print('Current frame:', frame_count)
 
     vid_cap.set(1, frame_count)
     (success, frame) = vid_cap.read()
     (frame_h, frame_w) = frame.shape[:2]
-
-    # cv2.imshow('frame', frame)
-    # cv2.waitKey(5000)
-
-    print('(CP1)')
-
-    # cv2.imshow('Frame', frame)
-    # cv2.waitKey(1)
 
     confid = 0.5
     thresh = 0.5
@@ -74,8 +56,7 @@ for frame_count in range(clip_start, clip_end + 1):
     ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
     labels = open(labelsPath).read().strip().split("\n")
 
-    frame_resized = cv2.resize(frame, (416, 416))
-    # Scale image by dividing by 255. YoloV3 needs input size (416, 416)
+    frame_resized = cv2.resize(frame, (416, 416))                                                   # Scale image by dividing by 255. YoloV3 needs input size (416, 416)
     blob = cv2.dnn.blobFromImage(
         frame_resized, 1 / 255.0, (416, 416), swapRB=True, crop=False)
     blobb = blob.reshape(blob.shape[2], blob.shape[3], 3)
