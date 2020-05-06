@@ -83,8 +83,8 @@ if len(idxs) > 0:
 
     for i in idf:
 
-        (x, y) = (boxes[i][0], boxes[i][1])
-        (w, h) = (boxes[i][2], boxes[i][3])
+        (x[i], y[i]) = (boxes[i][0], boxes[i][1])
+        (w[i], h[i]) = (boxes[i][2], boxes[i][3])
         center = [int(x + w / 2), int(y + h / 2)]
         centers.append(center)
         cv2.circle(frame, tuple(center),1,(0,0,0),1)
@@ -92,13 +92,13 @@ if len(idxs) > 0:
         
         status.append(0)
 
-print(centers)
+    print(centers)
 
-print(x,y,h,w)
+    print(x,y,h,w)
 
-cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 150), 2)
+    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 150), 2)
 
-cv2.imshow('Social distancing analyser', frame)
-cv2.waitKey(2000)
+    cv2.imshow('Social distancing analyser', frame)
+    cv2.waitKey(2000)
 
 print('CP3')
