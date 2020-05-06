@@ -23,7 +23,7 @@ while count < 1000:
 print('Done')
 
 cv2.imshow('frame', frame)
-cv2.waitKey()
+cv2.waitKey(2000)
 
 confid = 0.5
 thresh = 0.5
@@ -47,7 +47,10 @@ boxes = []
 confidences = []
 classIDs = []
 
+print(boxes)
+
 for output in layerOutputs:
+    print(output)
     for detection in output:
         scores = detection[5:]
         classID = np.argmax(scores)
