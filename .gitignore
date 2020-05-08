@@ -6,3 +6,5 @@ yolov3.weights
 .vscode/settings.json
 *.json
 *.json
+*.avi
+Videos/WalkByShop1cor.mpg

@@ -1,3 +1,5 @@
+# Bruno Martens & Timo Vijn
+
 import os
 os.system('clear')
 
@@ -13,7 +15,9 @@ print(''), print('...'), print(''), print('Started at', start_time.strftime("%H:
 
 # vid_path = "./Videos/terrace1-c0.avi"
 # vid_path = "./Videos/video.mp4"
-vid_path = "./Videos/Delft.MOV"
+# vid_path = "./Videos/Delft.MOV"
+vid_path = "./Videos/TownCentreXVID.avi"
+# vid_path = "./Videos/WalkByShop1cor.mpg"
 
 ##########################
 # from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
@@ -28,8 +32,8 @@ vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
 print(''), print('...'), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
 
-clip_start = int(10 * vid_fps)
-clip_end = int(10.5 * vid_fps)
+clip_start = int(20 * vid_fps)
+clip_end = int(21 * vid_fps)
 
 for frame_count in range(clip_start, clip_end + 1):
 
@@ -44,7 +48,7 @@ for frame_count in range(clip_start, clip_end + 1):
 
     vid_cap.set(1, frame_count)
     (success, frame) = vid_cap.read()
-    frame = imutils.resize(frame, width=1920)
+    frame = imutils.resize(frame, width = 1920)
     (frame_h, frame_w) = frame.shape[:2]
 
     confid = 0.5
