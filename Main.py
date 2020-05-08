@@ -13,10 +13,10 @@ start_time = datetime.now()
 
 print(''), print('...'), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
 
+# vid_path = "./video.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
-# vid_path = "./Videos/video.mp4"
 # vid_path = "./Videos/Delft.MOV"
-vid_path = "./Videos/TownCentreXVID.avi"
+# vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
 
 ##########################
@@ -54,9 +54,9 @@ for frame_count in range(clip_start, clip_end + 1):
     confid = 0.5
     thresh = 0.5
 
-    wgt_path = "./Yolo/yolov3.weights"
-    cfg_path = "./Yolo/yolov3.cfg"
-    labelsPath = "./Yolo/coco.names"
+    wgt_path = "./YOLO/yolov3.weights"
+    cfg_path = "./YOLO/yolov3.cfg"
+    labelsPath = "./YOLO/coco.names"
 
     net = cv2.dnn.readNetFromDarknet(cfg_path, wgt_path)
     ln = net.getLayerNames()
