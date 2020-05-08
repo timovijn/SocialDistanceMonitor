@@ -54,9 +54,9 @@ for frame_count in range(clip_start, clip_end + 1):
     confid = 0.5
     thresh = 0.5
 
-    wgt_path = "./YOLO/yolov3.weights"
-    cfg_path = "./YOLO/yolov3.cfg"
-    labelsPath = "./YOLO/coco.names"
+    wgt_path = "./Yolo/yolov3.weights"
+    cfg_path = "./Yolo/yolov3.cfg"
+    labelsPath = "./Yolo/coco.names"
 
     net = cv2.dnn.readNetFromDarknet(cfg_path, wgt_path)
     ln = net.getLayerNames()
