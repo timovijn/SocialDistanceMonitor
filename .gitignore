@@ -1,11 +1,2 @@
-
-yolov4.weights
-.vscode/settings.json
-yolov3.weights
-.vscode/settings.json
-.vscode/settings.json
-*.json
-*.json
-*.avi
-Videos/WalkByShop1cor.mpg
-Videos/Delft.MOV
+YOLO
+Videos
