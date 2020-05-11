@@ -13,11 +13,12 @@ start_time = datetime.now()
 
 print(''), print('...'), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
 
-# vid_path = "./video.mp4"
+vid_path = "./video.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
 # vid_path = "./Videos/Delft.MOV"
 # vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
+# vid_path = "./Videos/Rosmalen.MOV"
 
 ##########################
 # from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
@@ -32,8 +33,8 @@ vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
 print(''), print('...'), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
 
-clip_start = int(20 * vid_fps)
-clip_end = int(21 * vid_fps)
+clip_start = int(10 * vid_fps)
+clip_end = int(12 * vid_fps)
 
 for frame_count in range(clip_start, clip_end + 1):
 
@@ -54,9 +55,9 @@ for frame_count in range(clip_start, clip_end + 1):
     confid = 0.5
     thresh = 0.5
 
-    wgt_path = "./YOLO/yolov3.weights"
-    cfg_path = "./YOLO/yolov3.cfg"
-    labelsPath = "./YOLO/coco.names"
+    wgt_path = "./Yolo/yolov3.weights"
+    cfg_path = "./Yolo/yolov3.cfg"
+    labelsPath = "./Yolo/coco.names"
 
     net = cv2.dnn.readNetFromDarknet(cfg_path, wgt_path)
     ln = net.getLayerNames()
