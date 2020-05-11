@@ -13,12 +13,13 @@ start_time = datetime.now()
 
 print(''), print('...'), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
 
-vid_path = "./video.mp4"
+# vid_path = "./video.mp4"
+# vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
 # vid_path = "./Videos/Delft.MOV"
 # vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
-# vid_path = "./Videos/Rosmalen.MOV"
+vid_path = "./Videos/Rosmalen.MOV"
 
 ##########################
 # from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
@@ -85,7 +86,7 @@ for frame_count in range(clip_start, clip_end + 1):
             scores = detection[5:]
             classID = np.argmax(scores)
             confidence = scores[classID]
-            if labels[classID] == "person":
+            if labels[classID] == "dog":
                 if confidence > confid:
                     box = detection[0:4] * \
                         np.array([frame_w, frame_h, frame_w, frame_h])
