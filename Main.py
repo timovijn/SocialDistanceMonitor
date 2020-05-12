@@ -57,7 +57,7 @@ clip_end = int(12 * vid_fps)
 
 ##########################
 ##########################
-frame_num = 0
+frame_num = 1
 total_pedestrians_detected = 0
 total_six_feet_violations = 0
 total_pairs = 0
@@ -75,6 +75,17 @@ scale_w = 1.2 / 2
 scale_h = 4 / 2
 
 SOLID_BACK_COLOR = (41, 41, 41)
+
+# Setuo video writer
+cap = cv2.VideoCapture(vid_path)
+height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+fps = int(cap.get(cv2.CAP_PROP_FPS))
+fourcc = cv2.VideoWriter_fourcc(*"XVID")
+output_movie = cv2.VideoWriter("Pedestrian_detect.avi", fourcc, vid_fps, (width, height))
+bird_movie = cv2.VideoWriter(
+    "Pedestrian_bird.avi", fourcc, vid_fps, (int(width * scale_w), int(height * scale_h))
+)
 
 ##########################
 ##########################
@@ -229,10 +240,10 @@ for frame_count in range(clip_start, clip_end + 1):
         total_pedestrians_detected += num_pedestrians
         total_pairs += pairs
 
-        total_six_feet_violations += six_feet_violations / fps
+        total_six_feet_violations += six_feet_violations / vid_fps
         abs_six_feet_violations += six_feet_violations
         pedestrian_per_sec, sh_index = calculate_stay_at_home_index(
-            total_pedestrians_detected, frame_num, fps
+            total_pedestrians_detected, frame_num, vid_fps
         )
 
     last_h = 75
