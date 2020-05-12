@@ -18,7 +18,7 @@ vid_path = "./video.mp4"
 # vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
 # vid_path = "./Videos/Delft.MOV"
-vid_path = "./Videos/TownCentreXVID.avi"
+# vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
 # vid_path = "./Videos/Rosmalen.MOV"
 
@@ -50,7 +50,7 @@ def get_mouse_points(event, x, y, flags, param):
 vid_cap = cv2.VideoCapture(vid_path)
 vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
-print(''), print('...'), print(''), print(f'Path: {vid_path}'), print(f'Width: {int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))} px'), print(f'Height: {(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))} px')
+print(''), print('...'), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
 
 clip_start = int(10 * vid_fps)
 clip_end = int(12 * vid_fps)
@@ -71,8 +71,8 @@ cv2.setMouseCallback("image", get_mouse_points)
 num_mouse_points = 0
 first_frame_display = True
 
-scale_w = 1.2 / 2
-scale_h = 4 / 2
+scale_w = 1 # 1.2 / 2
+scale_h = 1 # 4 / 2
 
 SOLID_BACK_COLOR = (41, 41, 41)
 
@@ -131,6 +131,7 @@ for frame_count in range(clip_start, clip_end + 1):
     end = time.time()
 
     boxes = []
+    boxes_norm = []
     confidences = []
     classIDs = []
 
@@ -147,6 +148,7 @@ for frame_count in range(clip_start, clip_end + 1):
                     x = int(centerX - (width / 2))
                     y = int(centerY - (height / 2))
                     boxes.append([x, y, int(width), int(height)])
+                    boxes_norm.append([x/frame_w, y/frame_h, int(width)/frame_w, int(height)/frame_h])
                     confidences.append(float(confidence))
                     classIDs.append(classID)
     idxs = cv2.dnn.NMSBoxes(boxes, confidences, confid, thresh)
@@ -223,12 +225,13 @@ for frame_count in range(clip_start, clip_end + 1):
     )
     cv2.polylines(frame, [pts], True, (0, 255, 255), thickness=4)
 
-    pedestrian_boxes = boxes
-    num_pedestrians = len(boxes)
+    pedestrian_boxes = boxes_norm
+    num_pedestrians = len(boxes_norm)
     # Detect person and bounding boxes using DNN
     # pedestrian_boxes, num_pedestrians = DNN.detect_pedestrians(frame)
 
-    print(pedestrian_boxes)
+    # print(boxes)
+    # print(boxes_norm)
 
     if len(pedestrian_boxes) > 0:
         # pedestrian_detect = plot_pedestrian_boxes_on_image(frame, pedestrian_boxes)
@@ -265,6 +268,8 @@ for frame_count in range(clip_start, clip_end + 1):
     cv2.waitKey(1)
     output_movie.write(pedestrian_detect)
     bird_movie.write(bird_image)
+    print(warped_pt)
+    cv2.waitKey(0)
 
 end_time = datetime.now()
 

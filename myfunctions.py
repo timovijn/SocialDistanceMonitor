@@ -58,6 +58,8 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
 def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h):
     frame_h = frame.shape[0]
     frame_w = frame.shape[1]
+    # frame_h = 1
+    # frame_w = 1
 
     node_radius = 10
     color_node = (192, 133, 156)
