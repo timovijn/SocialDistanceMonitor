@@ -50,7 +50,7 @@ def get_mouse_points(event, x, y, flags, param):
 vid_cap = cv2.VideoCapture(vid_path)
 vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
-print('','...',''), print(f'Path: {vid_path}'), print(f'Width: {int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))} px'), print(f'Height: {(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))} px')
+print(''), print('...'), print(''), print(f'Path: {vid_path}'), print(f'Width: {int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))} px'), print(f'Height: {(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))} px')
 
 clip_start = int(10 * vid_fps)
 clip_end = int(12 * vid_fps)
@@ -82,9 +82,9 @@ height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 fps = int(cap.get(cv2.CAP_PROP_FPS))
 fourcc = cv2.VideoWriter_fourcc(*"XVID")
-output_movie = cv2.VideoWriter("Pedestrian_detect.avi", fourcc, vid_fps, (width, height))
+output_movie = cv2.VideoWriter("Pedestrian_detect.avi", fourcc, fps, (width, height))
 bird_movie = cv2.VideoWriter(
-    "Pedestrian_bird.avi", fourcc, vid_fps, (int(width * scale_w), int(height * scale_h))
+    "Pedestrian_bird.avi", fourcc, fps, (int(width * scale_w), int(height * scale_h))
 )
 
 ##########################
@@ -227,6 +227,8 @@ for frame_count in range(clip_start, clip_end + 1):
     num_pedestrians = len(boxes)
     # Detect person and bounding boxes using DNN
     # pedestrian_boxes, num_pedestrians = DNN.detect_pedestrians(frame)
+
+    print(pedestrian_boxes)
 
     if len(pedestrian_boxes) > 0:
         # pedestrian_detect = plot_pedestrian_boxes_on_image(frame, pedestrian_boxes)
