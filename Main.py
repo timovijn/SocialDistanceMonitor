@@ -18,7 +18,7 @@ vid_path = "./video.mp4"
 # vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
 # vid_path = "./Videos/Delft.MOV"
-# vid_path = "./Videos/TownCentreXVID.avi"
+vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
 # vid_path = "./Videos/Rosmalen.MOV"
 
@@ -50,7 +50,7 @@ def get_mouse_points(event, x, y, flags, param):
 vid_cap = cv2.VideoCapture(vid_path)
 vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
-print(''), print('...'), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
+print('','...',''), print(f'Path: {vid_path}'), print(f'Width: {int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))} px'), print(f'Height: {(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))} px')
 
 clip_start = int(10 * vid_fps)
 clip_end = int(12 * vid_fps)
@@ -206,7 +206,7 @@ for frame_count in range(clip_start, clip_end + 1):
 
         bird_image[:] = SOLID_BACK_COLOR
         pedestrian_detect = frame
-    
+
     pts = np.array(
         [four_points[0], four_points[1], four_points[3], four_points[2]], np.int32
     )
