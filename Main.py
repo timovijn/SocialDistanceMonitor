@@ -17,22 +17,16 @@ print(''), print('...'), print(''), print('Started at', start_time.strftime("%H:
 # vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
 # vid_path = "./Videos/Delft.MOV"
-# vid_path = "./Videos/TownCentreXVID.avi"
+vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
-vid_path = "./Videos/Rosmalen.MOV"
-
-##########################
-# from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
-# ffmpeg_extract_subclip(vid_path, 10, 20, targetname="clip.mp4")
-# clip_path = "clip.mp4"
-##########################
+#vid_path = "./Videos/Rosmalen.MOV"
 
 (frame_h, frame_w) = (None, None)
 
 vid_cap = cv2.VideoCapture(vid_path)
 vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
-print(''), print('...'), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
+print('','...',''), print(f'Path: {vid_path}'), print(f'Width: {int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))} px'), print(f'Height: {(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))} px')
 
 clip_start = int(10 * vid_fps)
 clip_end = int(12 * vid_fps)
@@ -147,3 +141,4 @@ print('Finished at {}'.format(end_time.strftime("%H:%M:%S")), '({})'.format(date
 print('')
 print('...')
 print('')
+
