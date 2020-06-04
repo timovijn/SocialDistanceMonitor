@@ -8,10 +8,12 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
     dist_condensed = pdist(p)
     dist = squareform(dist_condensed)
 
+    print(f'Distance: {dist}')
+
     # Close enough: 10 feet mark
     dd = np.where(dist < d_thresh * 6 / 10)
     close_p = []
-    color_10 = (80, 172, 110)
+    color_10 = (24, 255, 255)
     lineThickness = 4
     ten_feet_violations = len(np.where(dist_condensed < 10 / 6 * d_thresh)[0])
     for i in range(int(np.ceil(len(dd[0]) / 2))):
@@ -34,7 +36,7 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
     six_feet_violations = len(np.where(dist_condensed < d_thresh)[0])
     total_pairs = len(dist_condensed)
     danger_p = []
-    color_6 = (52, 92, 227)
+    color_6 = (255, 61, 0)
     for i in range(int(np.ceil(len(dd[0]) / 2))):
         if dd[0][i] != dd[1][i]:
             point1 = dd[0][i]
@@ -55,21 +57,28 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
     return six_feet_violations, ten_feet_violations, total_pairs
 
 
-def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h):
+def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh):
     frame_h = frame.shape[0]
     frame_w = frame.shape[1]
     # frame_h = 1
     # frame_w = 1
 
-    node_radius = 10
-    color_node = (192, 133, 156)
-    thickness_node = 20
-    solid_back_color = (41, 41, 41)
+    ##########################
+    node_radius = 20
+    node_color = (250, 250, 250)
+    node_thickness = -1
+    node_color_back = (33, 33, 33)
+    
+    hoop_radius = int(d_thresh)
+    hoop_color = (250, 250, 250)
+    hoop_thickness = 10
+    hoop_color_back = (250, 250, 250)
+    ##########################
 
     blank_image = np.zeros(
         (int(frame_h * scale_h), int(frame_w * scale_w), 3), np.uint8
     )
-    blank_image[:] = solid_back_color
+    blank_image[:] = node_color_back
     warped_pts = []
     for i in range(len(pedestrian_boxes)):
 
@@ -88,9 +97,17 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h):
         bird_image = cv2.circle(
             blank_image,
             (warped_pt_scaled[0], warped_pt_scaled[1]),
+            hoop_radius,
+            hoop_color,
+            hoop_thickness,
+        )
+
+        bird_image = cv2.circle(
+            blank_image,
+            (warped_pt_scaled[0], warped_pt_scaled[1]),
             node_radius,
-            color_node,
-            thickness_node,
+            node_color,
+            node_thickness,
         )
 
     return warped_pts, bird_image
@@ -149,8 +166,8 @@ def plot_pedestrian_boxes_on_image(frame, pedestrian_boxes):
     frame_h = frame.shape[0]
     frame_w = frame.shape[1]
     thickness = 2
-    # color_node = (192, 133, 156)
-    color_node = (160, 48, 112)
+    # node_color = (192, 133, 156)
+    node_color = (160, 48, 112)
     # color_10 = (80, 172, 110)
 
     for i in range(len(pedestrian_boxes)):
@@ -163,7 +180,7 @@ def plot_pedestrian_boxes_on_image(frame, pedestrian_boxes):
             int(pedestrian_boxes[i][2] * frame_h),
         )
 
-        frame_with_boxes = cv2.rectangle(frame, pt1, pt2, color_node, thickness)
+        frame_with_boxes = cv2.rectangle(frame, pt1, pt2, node_color, thickness)
 
 
     return frame_with_boxes

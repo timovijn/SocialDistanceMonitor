@@ -102,7 +102,7 @@ for frame_count in range(clip_start, clip_end + 1):
     print('...')
     print('')
 
-    print('Current frame:', frame_count)
+    print(f'Current frame: {frame_count} ({clip_start} → {clip_end})')
 
     vid_cap.set(1, frame_count)
     (success, frame) = vid_cap.read()
@@ -136,6 +136,8 @@ for frame_count in range(clip_start, clip_end + 1):
 
         bird_image[:] = SOLID_BACK_COLOR
         pedestrian_detect = frame
+
+        print(''),print('...'),print(''),print(f'Threshold: {int(d_thresh)} px'),print(''),print('...'),print('')
 
     confid = 0.5
     thresh = 0.5
@@ -192,7 +194,7 @@ for frame_count in range(clip_start, clip_end + 1):
                     classIDs.append(classID)
     idxs = cv2.dnn.NMSBoxes(boxes, confidences, confid, thresh)
 
-    print('Confidences:', confidences)
+    print('Confidences:', [round(num, 2) for num in confidences])
     print('(CP2)')
 
     if len(idxs) > 0:
@@ -200,7 +202,7 @@ for frame_count in range(clip_start, clip_end + 1):
         idf = idxs.flatten()
         close_pair = []
         s_close_pair = []
-        centers = []
+        centers = [] 
         co_info = []
         X = []
         Y = []
@@ -222,14 +224,13 @@ for frame_count in range(clip_start, clip_end + 1):
 
             status.append(0)
 
-        print('Centers:', centers)
-
         for i in range(0, len(idf)):
             cv2.rectangle(
                 frame, (X[i], Y[i]), (X[i] + W[i], Y[i] + H[i]), (0, 0, 150), 2)
         cv2.imshow('Person recognition', frame)
         cv2.waitKey(1)
-
+    
+    print('Centers:', centers)
     print('(CP3)')
 
     pts = np.array(
@@ -242,12 +243,11 @@ for frame_count in range(clip_start, clip_end + 1):
     num_pedestrians = len(boxes_norm)
     # Detect person and bounding boxes using DNN
     # pedestrian_boxes, num_pedestrians = DNN.detect_pedestrians(frame)
-    cv2.waitKey(0)
 
     if len(pedestrian_boxes) > 0:
         # pedestrian_detect = plot_pedestrian_boxes_on_image(frame, pedestrian_boxes)
         warped_pts, bird_image = plot_points_on_bird_eye_view(
-            frame, pedestrian_boxes, M, scale_w, scale_h
+            frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh
         )
         six_feet_violations, ten_feet_violations, pairs = plot_lines_between_nodes(
             warped_pts, bird_image, d_thresh
@@ -276,11 +276,9 @@ for frame_count in range(clip_start, clip_end + 1):
     pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
 
     cv2.imshow("Perspective", pedestrian_detect)
-    cv2.waitKey(1)
     output_movie.write(pedestrian_detect)
     bird_movie.write(bird_image)
-    print(warped_pt)
-    cv2.waitKey(1)
+    cv2.waitKey(0)
 
 end_time = datetime.now()
 
