@@ -49,7 +49,7 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
                 lineThickness,
             )
     # Display Birdeye view
-    cv2.imshow("Bird Eye View", bird_image)
+    cv2.imshow("Bird's-eye view", bird_image)
     cv2.waitKey(1)
 
     return six_feet_violations, ten_feet_violations, total_pairs

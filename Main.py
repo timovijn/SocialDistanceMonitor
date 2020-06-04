@@ -14,10 +14,10 @@ start_time = datetime.now()
 
 print(''), print('...'), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
 
-vid_path = "./video.mp4"
+# vid_path = "./video.mp4"
 # vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
-# vid_path = "./Videos/Delft.MOV"
+vid_path = "./Videos/Delft.MOV"
 # vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
 # vid_path = "./Videos/Rosmalen.MOV"
@@ -52,8 +52,8 @@ vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
 print(''), print('...'), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
 
-clip_start = int(10 * vid_fps)
-clip_end = int(12 * vid_fps)
+clip_start = int(0 * vid_fps)
+clip_end = int(1 * vid_fps)
 
 ##########################
 ##########################
@@ -66,8 +66,8 @@ pedestrian_per_sec = 0
 sh_index = 1
 sc_index = 1
 
-cv2.namedWindow("image")
-cv2.setMouseCallback("image", get_mouse_points)
+cv2.namedWindow("Perspective")
+cv2.setMouseCallback("Perspective", get_mouse_points)
 num_mouse_points = 0
 first_frame_display = True
 
@@ -131,7 +131,9 @@ for frame_count in range(clip_start, clip_end + 1):
     end = time.time()
 
     boxes = []
+    boxes2 = []
     boxes_norm = []
+    boxes_norm2 = []
     confidences = []
     classIDs = []
 
@@ -147,8 +149,14 @@ for frame_count in range(clip_start, clip_end + 1):
                     (centerX, centerY, width, height) = box.astype("int")
                     x = int(centerX - (width / 2))
                     y = int(centerY - (height / 2))
+                    x_l = centerX - (width / 2)
+                    x_r = centerX + (width / 2)
+                    y_t = centerY - (height / 2)
+                    y_b = centerY + (height / 2)
                     boxes.append([x, y, int(width), int(height)])
+                    boxes2.append([y_t,x_l,y_b,x_r])
                     boxes_norm.append([x/frame_w, y/frame_h, int(width)/frame_w, int(height)/frame_h])
+                    boxes_norm2.append([y_t/frame_h,x_l/frame_w,y_b/frame_h,x_r/frame_w])
                     confidences.append(float(confidence))
                     classIDs.append(classID)
     idxs = cv2.dnn.NMSBoxes(boxes, confidences, confid, thresh)
@@ -197,10 +205,10 @@ for frame_count in range(clip_start, clip_end + 1):
         # Ask user to mark parallel points and two points 6 feet apart. Order bl, br, tr, tl, p1, p2
         while True:
             image = frame
-            cv2.imshow("image", image)
+            cv2.imshow("Perspective", image)
             cv2.waitKey(1)
             if len(mouse_pts) == 7:
-                cv2.destroyWindow("image")
+                cv2.destroyWindow("Perspective")
                 break
             first_frame_display = False
         four_points = mouse_pts
@@ -226,12 +234,17 @@ for frame_count in range(clip_start, clip_end + 1):
     cv2.polylines(frame, [pts], True, (0, 255, 255), thickness=4)
 
     pedestrian_boxes = boxes_norm
+    pedestrian_boxes = boxes_norm2
     num_pedestrians = len(boxes_norm)
     # Detect person and bounding boxes using DNN
     # pedestrian_boxes, num_pedestrians = DNN.detect_pedestrians(frame)
 
-    # print(boxes)
-    # print(boxes_norm)
+    print(boxes)
+    print(boxes2)
+    print(boxes_norm)
+    print(boxes_norm2)
+    cv2.waitKey(0)
+    
 
     if len(pedestrian_boxes) > 0:
         # pedestrian_detect = plot_pedestrian_boxes_on_image(frame, pedestrian_boxes)
@@ -264,12 +277,12 @@ for frame_count in range(clip_start, clip_end + 1):
     text = "Social-distancing Index: " + str(np.round(100 * sc_index, 1)) + "%"
     pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
 
-    cv2.imshow("Street Cam", pedestrian_detect)
+    cv2.imshow("Perspective", pedestrian_detect)
     cv2.waitKey(1)
     output_movie.write(pedestrian_detect)
     bird_movie.write(bird_image)
     print(warped_pt)
-    cv2.waitKey(0)
+    cv2.waitKey(1)
 
 end_time = datetime.now()
 
