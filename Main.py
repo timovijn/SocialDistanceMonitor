@@ -17,10 +17,13 @@ print(''), print('...'), print(''), print('Started at', start_time.strftime("%H:
 # vid_path = "./video.mp4"
 # vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
-vid_path = "./Videos/Delft.MOV"
-# vid_path = "./Videos/TownCentreXVID.avi"
+# vid_path = "./Videos/Delft.MOV"
+vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
 # vid_path = "./Videos/Rosmalen.MOV"
+
+clip_start_s = 30
+clip_end_s = 35
 
 ##########################
 # from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
@@ -52,8 +55,8 @@ vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
 print(''), print('...'), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
 
-clip_start = int(0 * vid_fps)
-clip_end = int(1 * vid_fps)
+clip_start = int(clip_start_s * vid_fps)
+clip_end = int(clip_end_s * vid_fps)
 
 ##########################
 ##########################
@@ -72,11 +75,11 @@ num_mouse_points = 0
 first_frame_display = True
 
 scale_w = 1 # 1.2 / 2
-scale_h = 1 # 4 / 2
+scale_h = 2 # 4 / 2
 
 SOLID_BACK_COLOR = (41, 41, 41)
 
-# Setuo video writer
+# Setup video writer
 cap = cv2.VideoCapture(vid_path)
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -105,6 +108,34 @@ for frame_count in range(clip_start, clip_end + 1):
     (success, frame) = vid_cap.read()
     frame = imutils.resize(frame, width = 1920)
     (frame_h, frame_w) = frame.shape[:2]
+
+    if frame_count == clip_start:
+        # Ask user to mark parallel points and two points 6 feet apart. Order bl, br, tr, tl, p1, p2
+        print(''),print('...'),print(''),print('Mark (Bottom left) → (Bottom right) → (Top left) → (Top right)'),print(''),print('...'),print('')
+        while True:
+            image = frame
+            cv2.imshow("Perspective", image)
+            cv2.waitKey(1)
+            if len(mouse_pts) == 7:
+                cv2.destroyWindow("Perspective")
+                break
+            first_frame_display = False
+        four_points = mouse_pts
+
+        # Get perspective
+        M, Minv = get_camera_perspective(frame, four_points[0:4])
+        pts = src = np.float32(np.array([four_points[4:]]))
+        warped_pt = cv2.perspectiveTransform(pts, M)[0]
+        d_thresh = np.sqrt(
+            (warped_pt[0][0] - warped_pt[1][0]) ** 2
+            + (warped_pt[0][1] - warped_pt[1][1]) ** 2
+        )
+        bird_image = np.zeros(
+            (int(frame_h * scale_h), int(frame_w * scale_w), 3), np.uint8
+        )
+
+        bird_image[:] = SOLID_BACK_COLOR
+        pedestrian_detect = frame
 
     confid = 0.5
     thresh = 0.5
@@ -201,33 +232,6 @@ for frame_count in range(clip_start, clip_end + 1):
 
     print('(CP3)')
 
-    if frame_count == clip_start:
-        # Ask user to mark parallel points and two points 6 feet apart. Order bl, br, tr, tl, p1, p2
-        while True:
-            image = frame
-            cv2.imshow("Perspective", image)
-            cv2.waitKey(1)
-            if len(mouse_pts) == 7:
-                cv2.destroyWindow("Perspective")
-                break
-            first_frame_display = False
-        four_points = mouse_pts
-
-        # Get perspective
-        M, Minv = get_camera_perspective(frame, four_points[0:4])
-        pts = src = np.float32(np.array([four_points[4:]]))
-        warped_pt = cv2.perspectiveTransform(pts, M)[0]
-        d_thresh = np.sqrt(
-            (warped_pt[0][0] - warped_pt[1][0]) ** 2
-            + (warped_pt[0][1] - warped_pt[1][1]) ** 2
-        )
-        bird_image = np.zeros(
-            (int(frame_h * scale_h), int(frame_w * scale_w), 3), np.uint8
-        )
-
-        bird_image[:] = SOLID_BACK_COLOR
-        pedestrian_detect = frame
-
     pts = np.array(
         [four_points[0], four_points[1], four_points[3], four_points[2]], np.int32
     )
@@ -238,13 +242,7 @@ for frame_count in range(clip_start, clip_end + 1):
     num_pedestrians = len(boxes_norm)
     # Detect person and bounding boxes using DNN
     # pedestrian_boxes, num_pedestrians = DNN.detect_pedestrians(frame)
-
-    print(boxes)
-    print(boxes2)
-    print(boxes_norm)
-    print(boxes_norm2)
     cv2.waitKey(0)
-    
 
     if len(pedestrian_boxes) > 0:
         # pedestrian_detect = plot_pedestrian_boxes_on_image(frame, pedestrian_boxes)
