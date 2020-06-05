@@ -14,7 +14,7 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
     dist_condensed = pdist(p)
     dist = squareform(dist_condensed)
 
-    print(f'Distance: {dist}')
+    # print(f'Distance: {dist}')
 
     # Close enough: 10 feet mark
     dd = np.where(dist < d_thresh * 6 / 10)
