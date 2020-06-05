@@ -8,22 +8,23 @@ import time
 import numpy as np
 import imutils
 from myfunctions import *
-
 from datetime import datetime
-start_time = datetime.now()
+from SecretColors.palette import Palette
+material = Palette("material",color_mode="rgb255")
 
+start_time = datetime.now()
 print(''), print('...'), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
 
 # vid_path = "./video.mp4"
 # vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
-# vid_path = "./Videos/Delft.MOV"
-vid_path = "./Videos/TownCentreXVID.avi"
+vid_path = "./Videos/Delft.MOV"
+# vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
 # vid_path = "./Videos/Rosmalen.MOV"
 
-clip_start_s = 30
-clip_end_s = 35
+clip_start_s = 11
+clip_end_s = 15
 
 ##########################
 # from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
@@ -39,7 +40,7 @@ def get_mouse_points(event, x, y, flags, param):
     global mouse_x, mouse_y, mouse_pts
     if event == cv2.EVENT_LBUTTONDOWN:
         mouse_x, mouse_y = x, y
-        cv2.circle(image, (x, y), 10, (0, 255, 255), 10)
+        cv2.circle(image, (x, y), 10, material.red(shade=50), 10)
         if "mouse_pts" not in globals():
             mouse_pts = []
         mouse_pts.append((x, y))
@@ -75,9 +76,9 @@ num_mouse_points = 0
 first_frame_display = True
 
 scale_w = 1 # 1.2 / 2
-scale_h = 2 # 4 / 2
+scale_h = 1 # 4 / 2
 
-SOLID_BACK_COLOR = (41, 41, 41)
+SOLID_BACK_COLOR = material.gray(shade=90)
 
 # Setup video writer
 cap = cv2.VideoCapture(vid_path)
@@ -241,6 +242,7 @@ for frame_count in range(clip_start, clip_end + 1):
     pedestrian_boxes = boxes_norm
     pedestrian_boxes = boxes_norm2
     num_pedestrians = len(boxes_norm)
+    print(f'Pedestrians: {num_pedestrians}')
     # Detect person and bounding boxes using DNN
     # pedestrian_boxes, num_pedestrians = DNN.detect_pedestrians(frame)
 

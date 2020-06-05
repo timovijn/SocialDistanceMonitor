@@ -1,7 +1,13 @@
 import cv2
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
+from SecretColors.palette import Palette
+material = Palette("material",color_mode="rgb255")
 
+def plot_lines_between_nodes2(warped_points, bird_image, d_thresh):
+    p = np.array(warped_points)
+    dist_condensed = pdist(p)
+    dist = squareform(dist_condensed)
 
 def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
     p = np.array(warped_points)
@@ -14,7 +20,7 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
     dd = np.where(dist < d_thresh * 6 / 10)
     close_p = []
     color_10 = (24, 255, 255)
-    lineThickness = 4
+    lineThickness2 = 1
     ten_feet_violations = len(np.where(dist_condensed < 10 / 6 * d_thresh)[0])
     for i in range(int(np.ceil(len(dd[0]) / 2))):
         if dd[0][i] != dd[1][i]:
@@ -28,7 +34,7 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
                 (p[point1][0], p[point1][1]),
                 (p[point2][0], p[point2][1]),
                 color_10,
-                lineThickness,
+                lineThickness2,
             )
 
     # Really close: 6 feet mark
@@ -37,6 +43,8 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
     total_pairs = len(dist_condensed)
     danger_p = []
     color_6 = (255, 61, 0)
+    line_color = material.red(shade=50)
+    lineThickness = 8
     for i in range(int(np.ceil(len(dd[0]) / 2))):
         if dd[0][i] != dd[1][i]:
             point1 = dd[0][i]
@@ -47,7 +55,7 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
                 bird_image,
                 (p[point1][0], p[point1][1]),
                 (p[point2][0], p[point2][1]),
-                color_6,
+                line_color,
                 lineThickness,
             )
     # Display Birdeye view
@@ -65,20 +73,20 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
 
     ##########################
     node_radius = 20
-    node_color = (250, 250, 250)
+    node_color = material.gray(shade=50)
     node_thickness = -1
-    node_color_back = (33, 33, 33)
+    
+    background_color = material.gray(shade=90)
     
     hoop_radius = int(d_thresh)
-    hoop_color = (250, 250, 250)
+    hoop_color = material.gray(shade=50)
     hoop_thickness = 10
-    hoop_color_back = (250, 250, 250)
     ##########################
 
     blank_image = np.zeros(
         (int(frame_h * scale_h), int(frame_w * scale_w), 3), np.uint8
     )
-    blank_image[:] = node_color_back
+    blank_image[:] = background_color
     warped_pts = []
     for i in range(len(pedestrian_boxes)):
 
