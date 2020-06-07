@@ -4,17 +4,15 @@ from scipy.spatial.distance import pdist, squareform
 from SecretColors.palette import Palette
 material = Palette("material",color_mode="rgb255")
 
-def plot_lines_between_nodes2(warped_points, bird_image, d_thresh):
-    p = np.array(warped_points)
+def plot_lines_between_nodes2(warped_pts, bird_image, d_thresh):
+    p = np.array(warped_pts)
     dist_condensed = pdist(p)
     dist = squareform(dist_condensed)
 
-def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
-    p = np.array(warped_points)
+def plot_lines_between_nodes(warped_pts, bird_image, d_thresh):
+    p = np.array(warped_pts)
     dist_condensed = pdist(p)
     dist = squareform(dist_condensed)
-
-    # print(f'Distance: {dist}')
 
     # Close enough: 10 feet mark
     dd = np.where(dist < d_thresh * 6 / 10)
@@ -22,6 +20,7 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
     color_10 = (24, 255, 255)
     lineThickness2 = 1
     ten_feet_violations = len(np.where(dist_condensed < 10 / 6 * d_thresh)[0])
+    
     for i in range(int(np.ceil(len(dd[0]) / 2))):
         if dd[0][i] != dd[1][i]:
             point1 = dd[0][i]
@@ -38,13 +37,15 @@ def plot_lines_between_nodes(warped_points, bird_image, d_thresh):
             )
 
     # Really close: 6 feet mark
-    dd = np.where(dist < d_thresh)
+    dd = np.where((dist < d_thresh) & (dist > 0))
     six_feet_violations = len(np.where(dist_condensed < d_thresh)[0])
     total_pairs = len(dist_condensed)
     danger_p = []
     color_6 = (255, 61, 0)
     line_color = material.red(shade=50)
     lineThickness = 8
+    # print(warped_pts)
+
     for i in range(int(np.ceil(len(dd[0]) / 2))):
         if dd[0][i] != dd[1][i]:
             point1 = dd[0][i]
@@ -117,6 +118,39 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
             node_color,
             node_thickness,
         )
+
+        p = np.array(warped_pts)
+        dist_condensed = pdist(p)
+        dist = squareform(dist_condensed)
+
+        dd = np.where((dist < d_thresh) & (dist > 0))
+        print(dd[0])
+        print(f'Distance: {dist}')
+        print(f'Warped points {warped_pts}')
+        print(f'Violations: {dd}')
+
+        violation_color = material.purple(shade=50)
+
+        for node in range(len(dd[0])):
+            print(warped_pts[dd[0][node]])
+            print(warped_pts[dd[0][node]][0])
+            print(warped_pts[dd[1][node]])
+
+            bird_image = cv2.circle(
+                blank_image,
+                int(warped_pts[dd[0][node]][0]), int(warped_pts[dd[0][node]][1]),
+                node_radius,
+                violation_color,
+                node_thickness,
+            )
+
+            bird_image = cv2.circle(
+                blank_image,
+                int(warped_pts[dd[1][node]][0]), int(warped_pts[dd[1][node]][1]),
+                node_radius,
+                violation_color,
+                node_thickness,
+            )
 
     return warped_pts, bird_image
 

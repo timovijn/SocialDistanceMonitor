@@ -18,12 +18,12 @@ print(''), print('...'), print(''), print('Started at', start_time.strftime("%H:
 # vid_path = "./video.mp4"
 # vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
-# vid_path = "./Videos/Delft.MOV"
-vid_path = "./Videos/TownCentreXVID.avi"
+vid_path = "./Videos/Delft.MOV"
+# vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
 # vid_path = "./Videos/Rosmalen.MOV"
 
-clip_start_s = 100
+clip_start_s = 11
 clip_end_s = 200
 
 ##########################
@@ -194,18 +194,13 @@ for frame_count in range(clip_start, clip_end + 1):
                     confidences.append(float(confidence))
                     classIDs.append(classID)
     idxs = cv2.dnn.NMSBoxes(boxes, confidences, confid, thresh)
-    print(f'Indexes: {idxs}')
     # boxes = boxes[idxs.flatten()]
-    print(idxs.flatten())
-    
-    print(f'Boxes (old): {boxes}')
     boxes = np.array(boxes)[idxs.flatten()]
     boxes2 = np.array(boxes2)[idxs.flatten()]
     boxes_norm = np.array(boxes_norm)[idxs.flatten()]
     boxes_norm2 = np.array(boxes_norm2)[idxs.flatten()]
     confidences = np.array(confidences)[idxs.flatten()]
     classIDs = np.array(classIDs)[idxs.flatten()]
-    print(f'Boxes (new): {boxes}')
 
     print('Confidences:', [round(num, 2) for num in confidences])
     print('(CP2)')
@@ -245,6 +240,9 @@ for frame_count in range(clip_start, clip_end + 1):
     
     print('Centers:', centers)
     print('(CP3)')
+    print('')
+    print('...')
+    print('')
 
     pts = np.array(
         [four_points[0], four_points[1], four_points[3], four_points[2]], np.int32
@@ -253,9 +251,6 @@ for frame_count in range(clip_start, clip_end + 1):
 
     pedestrian_boxes = boxes_norm2
     num_pedestrians = len(boxes_norm2)
-    print(f'Boxes norm: {len(boxes_norm2)}')
-    print(f'Boxes: {len(boxes)}')
-    print(f'Indexes: {len(idxs)}')
     # Detect person and bounding boxes using DNN
     # pedestrian_boxes, num_pedestrians = DNN.detect_pedestrians(frame)
 
@@ -293,7 +288,7 @@ for frame_count in range(clip_start, clip_end + 1):
     cv2.imshow("Perspective", pedestrian_detect)
     output_movie.write(pedestrian_detect)
     bird_movie.write(bird_image)
-    # cv2.waitKey(0)
+    cv2.waitKey(0)
 
 end_time = datetime.now()
 
