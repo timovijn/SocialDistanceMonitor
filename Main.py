@@ -67,6 +67,7 @@ clip_end = int(clip_end_s * vid_fps)
 frame_num = 1
 num_violations_cumulative = 0
 num_pedestrians_cumulative = 0
+num_frame = 0
 total_pedestrians_detected = 0
 total_six_feet_violations = 0
 total_pairs = 0
@@ -101,10 +102,12 @@ bird_movie = cv2.VideoWriter(
 
 for frame_count in range(clip_start, clip_end + 1):
 
+    num_frame += 1
+
     if frame_count > clip_end:
         break
 
-    print(''), print(colored('...','white')), print(''), print(colored('New frame', 'green'),f'{frame_count} ({clip_start} → {clip_end})')
+    print(''), print(colored('...','white')), print(''), print(colored('New frame', 'green'),f'{frame_count} ({clip_start} → {clip_end}) ({num_frame})')
 
     vid_cap.set(1, frame_count)
     (success, frame) = vid_cap.read()
@@ -275,6 +278,10 @@ for frame_count in range(clip_start, clip_end + 1):
         print(f'Pairs: {pairs}')
         print(f'Violating pairs: {dd}')
         print(f'Violations: {num_violations} ({num_violations_cumulative})')
+
+        print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing performance'), print(''), print(colored('...','white')), print('')
+        print(f'Violations: {round(num_violations_cumulative/num_frame,1)}')
+        print(f'Pedestrians: {round(num_pedestrians_cumulative/num_frame,1)}')
 
     # last_h = 75
     # text = "# 6ft violations: " + str(int(total_six_feet_violations))
