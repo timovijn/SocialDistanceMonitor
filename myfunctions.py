@@ -28,13 +28,13 @@ def plot_lines_between_nodes(warped_pts, bird_image, d_thresh):
 
             close_p.append([point1, point2])
 
-            cv2.line(
-                bird_image,
-                (p[point1][0], p[point1][1]),
-                (p[point2][0], p[point2][1]),
-                color_10,
-                lineThickness2,
-            )
+            # cv2.line(
+            #     bird_image,
+            #     (p[point1][0], p[point1][1]),
+            #     (p[point2][0], p[point2][1]),
+            #     color_10,
+            #     lineThickness2,
+            # )
 
     # Really close: 6 feet mark
     dd = np.where((dist < d_thresh) & (dist > 0))
@@ -52,13 +52,13 @@ def plot_lines_between_nodes(warped_pts, bird_image, d_thresh):
             point2 = dd[1][i]
 
             danger_p.append([point1, point2])
-            cv2.line(
-                bird_image,
-                (p[point1][0], p[point1][1]),
-                (p[point2][0], p[point2][1]),
-                line_color,
-                lineThickness,
-            )
+            # cv2.line(
+            #     bird_image,
+            #     (p[point1][0], p[point1][1]),
+            #     (p[point2][0], p[point2][1]),
+            #     line_color,
+            #     lineThickness,
+            # )
     # Display Birdeye view
     cv2.imshow("Bird's-eye view", bird_image)
     cv2.waitKey(1)
@@ -81,7 +81,11 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
     
     hoop_radius = int(d_thresh)
     hoop_color = material.gray(shade=50)
-    hoop_thickness = 10
+    hoop_thickness = 5
+
+    violation_color = material.purple(shade=50)
+
+    line_thickness = 5
     ##########################
 
     blank_image = np.zeros(
@@ -123,22 +127,16 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
         dist_condensed = pdist(p)
         dist = squareform(dist_condensed)
 
-        dd = np.where((dist < d_thresh) & (dist > 0))
-        print(dd[0])
-        print(f'Distance: {dist}')
-        print(f'Warped points {warped_pts}')
-        print(f'Violations: {dd}')
+        pairs = len(dist_condensed)
 
-        violation_color = material.purple(shade=50)
+        dd = np.where((dist < d_thresh) & (dist > 0))
+        num_violations = int(len(dd[0])/2)
 
         for node in range(len(dd[0])):
-            print(warped_pts[dd[0][node]])
-            print(warped_pts[dd[0][node]][0])
-            print(warped_pts[dd[1][node]])
 
             bird_image = cv2.circle(
                 blank_image,
-                int(warped_pts[dd[0][node]][0]), int(warped_pts[dd[0][node]][1]),
+                (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]),
                 node_radius,
                 violation_color,
                 node_thickness,
@@ -146,13 +144,24 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
 
             bird_image = cv2.circle(
                 blank_image,
-                int(warped_pts[dd[1][node]][0]), int(warped_pts[dd[1][node]][1]),
+                (warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]),
                 node_radius,
                 violation_color,
                 node_thickness,
             )
 
-    return warped_pts, bird_image
+            cv2.line(
+                bird_image,
+                (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]),
+                (warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]),
+                violation_color,
+                line_thickness,
+            )
+
+    cv2.imshow("Bird's-eye view", bird_image)
+    cv2.waitKey(1)
+
+    return warped_pts, bird_image, pairs, num_violations, dd
 
 
 def get_camera_perspective(img, src_points):

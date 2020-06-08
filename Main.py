@@ -11,15 +11,16 @@ from myfunctions import *
 from datetime import datetime
 from SecretColors.palette import Palette
 material = Palette("material",color_mode="rgb255")
+from termcolor import colored
 
 start_time = datetime.now()
-print(''), print('...'), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
+print(''), print(colored('...','white')), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
 
 # vid_path = "./video.mp4"
 # vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
-vid_path = "./Videos/Delft.MOV"
-# vid_path = "./Videos/TownCentreXVID.avi"
+# vid_path = "./Videos/Delft.MOV"
+vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
 # vid_path = "./Videos/Rosmalen.MOV"
 
@@ -54,7 +55,9 @@ def get_mouse_points(event, x, y, flags, param):
 vid_cap = cv2.VideoCapture(vid_path)
 vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
-print(''), print('...'), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
+print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Initialisation')
+
+print(''), print(colored('...','white')), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
 
 clip_start = int(clip_start_s * vid_fps)
 clip_end = int(clip_end_s * vid_fps)
@@ -62,6 +65,8 @@ clip_end = int(clip_end_s * vid_fps)
 ##########################
 ##########################
 frame_num = 1
+num_violations_cumulative = 0
+num_pedestrians_cumulative = 0
 total_pedestrians_detected = 0
 total_six_feet_violations = 0
 total_pairs = 0
@@ -99,11 +104,7 @@ for frame_count in range(clip_start, clip_end + 1):
     if frame_count > clip_end:
         break
 
-    print('')
-    print('...')
-    print('')
-
-    print(f'Current frame: {frame_count} ({clip_start} → {clip_end})')
+    print(''), print(colored('...','white')), print(''), print(colored('New frame', 'green'),f'{frame_count} ({clip_start} → {clip_end})')
 
     vid_cap.set(1, frame_count)
     (success, frame) = vid_cap.read()
@@ -112,7 +113,8 @@ for frame_count in range(clip_start, clip_end + 1):
 
     if frame_count == clip_start:
         # Ask user to mark parallel points and two points 6 feet apart. Order bl, br, tr, tl, p1, p2
-        print(''),print('...'),print(''),print('Mark (Bottom left) → (Bottom right) → (Top left) → (Top right)'),print(''),print('...'),print('')
+        print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Perspective')
+        print(''),print(colored('...','white')),print(''),print('Mark (Bottom left) → (Bottom right) → (Top left) → (Top right)'),print(''),print(colored('...','white')),print('')
         while True:
             image = frame
             cv2.imshow("Perspective", image)
@@ -138,7 +140,7 @@ for frame_count in range(clip_start, clip_end + 1):
         bird_image[:] = SOLID_BACK_COLOR
         pedestrian_detect = frame
 
-        print(''),print('...'),print(''),print(f'Threshold: {int(d_thresh)} px'),print(''),print('...'),print('')
+        print(''),print(colored('...','white')),print(''),print(f'Threshold: {int(d_thresh)} px')
 
     confid = 0.5
     thresh = 0.5
@@ -202,8 +204,8 @@ for frame_count in range(clip_start, clip_end + 1):
     confidences = np.array(confidences)[idxs.flatten()]
     classIDs = np.array(classIDs)[idxs.flatten()]
 
-    print('Confidences:', [round(num, 2) for num in confidences])
-    print('(CP2)')
+    print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Object detection')
+    print(''),print(colored('...','white')),print(''),print('Confidences:', [round(num, 2) for num in confidences])
 
     if len(idxs) > 0:
         status = []
@@ -239,10 +241,6 @@ for frame_count in range(clip_start, clip_end + 1):
         cv2.waitKey(1)
     
     print('Centers:', centers)
-    print('(CP3)')
-    print('')
-    print('...')
-    print('')
 
     pts = np.array(
         [four_points[0], four_points[1], four_points[3], four_points[2]], np.int32
@@ -255,35 +253,41 @@ for frame_count in range(clip_start, clip_end + 1):
     # pedestrian_boxes, num_pedestrians = DNN.detect_pedestrians(frame)
 
     if len(pedestrian_boxes) > 0:
+        print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing'), print(''), print(colored('...','white')), print('')
         # pedestrian_detect = plot_pedestrian_boxes_on_image(frame, pedestrian_boxes)
-        warped_pts, bird_image = plot_points_on_bird_eye_view(
+        warped_pts, bird_image, pairs, num_violations, dd = plot_points_on_bird_eye_view(
             frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh
         )
-        six_feet_violations, ten_feet_violations, pairs = plot_lines_between_nodes(
-            warped_pts, bird_image, d_thresh
-        )
+        # six_feet_violations, ten_feet_violations, pairs = plot_lines_between_nodes(
+        #     warped_pts, bird_image, d_thresh
+        # )
         # plot_violation_rectangles(pedestrian_boxes, )
-        total_pedestrians_detected += num_pedestrians
-        total_pairs += pairs
 
-        total_six_feet_violations += six_feet_violations / vid_fps
-        abs_six_feet_violations += six_feet_violations
-        pedestrian_per_sec, sh_index = calculate_stay_at_home_index(
-            total_pedestrians_detected, frame_num, vid_fps
-        )
+        num_violations_cumulative += num_violations
+        num_pedestrians_cumulative += num_pedestrians
 
-    last_h = 75
-    text = "# 6ft violations: " + str(int(total_six_feet_violations))
-    pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
+        # total_six_feet_violations += violations / vid_fps
+        # abs_six_feet_violations += violations
+        # pedestrian_per_sec, sh_index = calculate_stay_at_home_index(
+        #     total_pedestrians_detected, frame_num, vid_fps
+        # )
+        print(f'Pedestrians: {num_pedestrians} ({num_pedestrians_cumulative})')
+        print(f'Pairs: {pairs}')
+        print(f'Violating pairs: {dd}')
+        print(f'Violations: {num_violations} ({num_violations_cumulative})')
 
-    text = "Stay-at-home Index: " + str(np.round(100 * sh_index, 1)) + "%"
-    pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
+    # last_h = 75
+    # text = "# 6ft violations: " + str(int(total_six_feet_violations))
+    # pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
 
-    if total_pairs != 0:
-        sc_index = 1 - abs_six_feet_violations / total_pairs
+    # text = "Stay-at-home Index: " + str(np.round(100 * sh_index, 1)) + "%"
+    # pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
 
-    text = "Social-distancing Index: " + str(np.round(100 * sc_index, 1)) + "%"
-    pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
+    # if total_pairs != 0:
+    #     sc_index = 1 - abs_six_feet_violations / total_pairs
+
+    # text = "Social-distancing Index: " + str(np.round(100 * sc_index, 1)) + "%"
+    # pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
 
     cv2.imshow("Perspective", pedestrian_detect)
     output_movie.write(pedestrian_detect)
@@ -293,9 +297,9 @@ for frame_count in range(clip_start, clip_end + 1):
 end_time = datetime.now()
 
 print('')
-print('...')
+print(colored('...','white'))
 print('')
 print('Finished at {}'.format(end_time.strftime("%H:%M:%S")), '({})'.format(datetime.strptime(end_time.strftime("%H:%M:%S"), "%H:%M:%S") - datetime.strptime(start_time.strftime("%H:%M:%S"), "%H:%M:%S")))
 print('')
-print('...')
+print(colored('...','white'))
 print('')
