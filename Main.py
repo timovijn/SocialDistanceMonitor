@@ -280,6 +280,7 @@ for frame_count in range(clip_start, clip_end + 1):
         print(f'Violations: {num_violations} ({num_violations_cumulative})')
 
         print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing performance'), print(''), print(colored('...','white')), print('')
+        print(f'Frames: {num_frame}')
         print(f'Violations: {round(num_violations_cumulative/num_frame,1)}')
         print(f'Pedestrians: {round(num_pedestrians_cumulative/num_frame,1)}')
 
