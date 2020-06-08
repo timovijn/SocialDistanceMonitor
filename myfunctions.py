@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 from SecretColors.palette import Palette
+import seaborn
 material = Palette("material",color_mode="rgb255")
 
 def plot_lines_between_nodes2(warped_pts, bird_image, d_thresh):
@@ -66,7 +67,7 @@ def plot_lines_between_nodes(warped_pts, bird_image, d_thresh):
     return six_feet_violations, ten_feet_violations, total_pairs
 
 
-def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh):
+def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh,heatmap_matrix):
     frame_h = frame.shape[0]
     frame_w = frame.shape[1]
     # frame_h = 1
@@ -158,10 +159,27 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
                 line_thickness,
             )
 
+            # interval = 10
+
+            # height_value = warped_pts[dd[0][node]][0]
+            # width_value = warped_pts[dd[0][node]][1]
+
+            # print(height_value)
+            # print(width_value)
+            
+            # width_classification = int(np.floor(interval*width_value/1920))
+            # height_classification = int(np.floor(interval*height_value/1080))
+
+            # print(width_classification)
+            # print(height_classification)
+
+            # heatmap_matrix[height_classification][width_classification] += 1
+            # # heatmap_matrix[height_classification,width_classification] += 1
+
     cv2.imshow("Bird's-eye view", bird_image)
     cv2.waitKey(1)
 
-    return warped_pts, bird_image, pairs, num_violations, dd
+    return warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix
 
 
 def get_camera_perspective(img, src_points):

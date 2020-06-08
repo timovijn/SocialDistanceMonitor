@@ -12,6 +12,7 @@ from datetime import datetime
 from SecretColors.palette import Palette
 material = Palette("material",color_mode="rgb255")
 from termcolor import colored
+import matplotlib.pyplot as plt
 
 start_time = datetime.now()
 print(''), print(colored('...','white')), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
@@ -68,6 +69,7 @@ frame_num = 1
 num_violations_cumulative = 0
 num_pedestrians_cumulative = 0
 num_frame = 0
+heatmap_matrix = np.zeros((10,10))
 total_pedestrians_detected = 0
 total_six_feet_violations = 0
 total_pairs = 0
@@ -258,8 +260,8 @@ for frame_count in range(clip_start, clip_end + 1):
     if len(pedestrian_boxes) > 0:
         print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing'), print(''), print(colored('...','white')), print('')
         # pedestrian_detect = plot_pedestrian_boxes_on_image(frame, pedestrian_boxes)
-        warped_pts, bird_image, pairs, num_violations, dd = plot_points_on_bird_eye_view(
-            frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh
+        warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix = plot_points_on_bird_eye_view(
+            frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh,heatmap_matrix
         )
         # six_feet_violations, ten_feet_violations, pairs = plot_lines_between_nodes(
         #     warped_pts, bird_image, d_thresh
@@ -297,10 +299,24 @@ for frame_count in range(clip_start, clip_end + 1):
     # text = "Social-distancing Index: " + str(np.round(100 * sc_index, 1)) + "%"
     # pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
 
-    cv2.imshow("Perspective", pedestrian_detect)
-    output_movie.write(pedestrian_detect)
-    bird_movie.write(bird_image)
-    cv2.waitKey(0)
+    # uniform_data = np.random.rand(10, 10)
+    # print(uniform_data)
+    # seaborn.heatmap(uniform_data)
+    # plt.show()
+
+    # seaborn.heatmap(heatmap_matrix)
+    # plt.show()
+    # cv2.waitKey(2)
+    # plt.close()
+
+    # print(heatmap_matrix)
+
+    # cv2.imshow("Perspective", pedestrian_detect)
+    # output_movie.write(pedestrian_detect)
+    # bird_movie.write(bird_image)
+    # cv2.waitKey(0)
+
+    # plt.figure(figsize=[width,height])
 
 end_time = datetime.now()
 
