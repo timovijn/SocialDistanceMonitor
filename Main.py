@@ -1,8 +1,12 @@
 # Bruno Martens & Timo Vijn
+# Social Distancing
+
+#################### (Section) Preamble
+
+########## (Subsection) Packages
 
 import os
 os.system('clear')
-
 import cv2
 import time
 import numpy as np
@@ -13,9 +17,21 @@ from SecretColors.palette import Palette
 material = Palette("material",color_mode="rgb255")
 from termcolor import colored
 import matplotlib.pyplot as plt
+from tkinter import Tk
+
+########## (Subsection) Grab screen dimensions
+
+screen_width = Tk().winfo_screenwidth()
+screen_height = Tk().winfo_screenheight()
+print(screen_width,screen_height)
+
+########## (Subsection) Start timer
 
 start_time = datetime.now()
 print(''), print(colored('...','white')), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
+
+
+########## (Subsection) Choose video
 
 # vid_path = "./video.mp4"
 # vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
@@ -25,18 +41,23 @@ vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
 # vid_path = "./Videos/Rosmalen.MOV"
 
+vid_cap = cv2.VideoCapture(vid_path)
+vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
+
+########## (Subsection) Choose clip region
+
 clip_start_s = 11
 clip_end_s = 15
 
-##########################
-# from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
-# ffmpeg_extract_subclip(vid_path, 10, 20, targetname="clip.mp4")
-# clip_path = "clip.mp4"
-##########################
+clip_start = int(clip_start_s * vid_fps)
+clip_end = int(clip_end_s * vid_fps)
 
-##########################
-##########################
-mouse_pts = []
+########## (Subsection) Print video information
+
+print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Initialisation')
+print(''), print(colored('...','white')), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
+
+########## (Subsection) Define clicking function
 
 def get_mouse_points(event, x, y, flags, param):
     global mouse_x, mouse_y, mouse_pts
@@ -46,29 +67,17 @@ def get_mouse_points(event, x, y, flags, param):
         if "mouse_pts" not in globals():
             mouse_pts = []
         mouse_pts.append((x, y))
-        print("Point detected")
-        print(mouse_pts)
-##########################
-##########################
+        print("Point marked")
+        print(x,y)
 
+########## (Subsection) Initialise variables
+
+mouse_pts = []
 (frame_h, frame_w) = (None, None)
-
-vid_cap = cv2.VideoCapture(vid_path)
-vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
-
-print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Initialisation')
-
-print(''), print(colored('...','white')), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
-
-clip_start = int(clip_start_s * vid_fps)
-clip_end = int(clip_end_s * vid_fps)
-
-##########################
-##########################
 frame_num = 1
 num_violations_cumulative = 0
 num_pedestrians_cumulative = 0
-num_frame = 0
+frame_num = 0
 heatmap_matrix = np.zeros((10,10))
 total_pedestrians_detected = 0
 total_six_feet_violations = 0
@@ -78,45 +87,45 @@ pedestrian_per_sec = 0
 sh_index = 1
 sc_index = 1
 
+########## (Subsection) Initialise windows
+
 cv2.namedWindow("Perspective")
 cv2.setMouseCallback("Perspective", get_mouse_points)
-num_mouse_points = 0
 first_frame_display = True
 
-scale_w = 1 # 1.2 / 2
-scale_h = 1 # 4 / 2
+scale_w = 1
+scale_h = 1
 
 SOLID_BACK_COLOR = material.gray(shade=90)
 
-# Setup video writer
-cap = cv2.VideoCapture(vid_path)
-height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-fps = int(cap.get(cv2.CAP_PROP_FPS))
+########## (Subsection) Setup video writer
+
+height = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+width = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 fourcc = cv2.VideoWriter_fourcc(*"XVID")
-output_movie = cv2.VideoWriter("Pedestrian_detect.avi", fourcc, fps, (width, height))
+output_movie = cv2.VideoWriter("Pedestrian_detect.avi", fourcc, vid_fps, (width, height))
 bird_movie = cv2.VideoWriter(
-    "Pedestrian_bird.avi", fourcc, fps, (int(width * scale_w), int(height * scale_h))
+    "Pedestrian_bird.avi", fourcc, vid_fps, (int(width * scale_w), int(height * scale_h))
 )
 
-##########################
-##########################
+#################### (Section) Start
 
-for frame_count in range(clip_start, clip_end + 1):
+for frame_idx in range(clip_start, clip_end + 1):
 
-    num_frame += 1
+    frame_num += 1
 
-    if frame_count > clip_end:
+    if frame_idx > clip_end:
         break
 
-    print(''), print(colored('...','white')), print(''), print(colored('New frame', 'green'),f'{frame_count} ({clip_start} → {clip_end}) ({num_frame})')
+    print(''), print(colored('...','white')), print(''), print(colored('New frame', 'green'),f'{frame_idx} ({clip_start} → {clip_end}) ({frame_num})')
 
-    vid_cap.set(1, frame_count)
+    vid_cap.set(1, frame_idx)
     (success, frame) = vid_cap.read()
-    frame = imutils.resize(frame, width = 1920)
     (frame_h, frame_w) = frame.shape[:2]
 
-    if frame_count == clip_start:
+    #################### (Section) Perspective
+
+    if frame_idx == clip_start:
         # Ask user to mark parallel points and two points 6 feet apart. Order bl, br, tr, tl, p1, p2
         print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Perspective')
         print(''),print(colored('...','white')),print(''),print('Mark (Bottom left) → (Bottom right) → (Top left) → (Top right)'),print(''),print(colored('...','white')),print('')
@@ -289,9 +298,9 @@ for frame_count in range(clip_start, clip_end + 1):
         print(f'Violations: {num_violations} ({num_violations_cumulative})')
 
         print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing performance'), print(''), print(colored('...','white')), print('')
-        print(f'Frames: {num_frame}')
-        print(f'Violations: {round(num_violations_cumulative/num_frame,1)}')
-        print(f'Pedestrians: {round(num_pedestrians_cumulative/num_frame,1)}')
+        print(f'Frames: {frame_num}')
+        print(f'Violations: {round(num_violations_cumulative/frame_num,1)}')
+        print(f'Pedestrians: {round(num_pedestrians_cumulative/frame_num,1)}')
 
     # last_h = 75
     # text = "# 6ft violations: " + str(int(total_six_feet_violations))

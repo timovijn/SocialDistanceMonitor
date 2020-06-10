@@ -215,6 +215,14 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
                 node_thickness,
             )
 
+            cv2.line(
+                frame,
+                (original_pt1[0], original_pt1[1]),
+                (original_pt2[0], original_pt2[1]),
+                violation_color,
+                line_thickness,
+            )
+
             # cv2.waitKey(0)
 
 
