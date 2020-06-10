@@ -1,9 +1,15 @@
+########################################
+########################################
+########################################
+########################################
 # Bruno Martens & Timo Vijn
 # Social Distancing
+########################################
+########################################
+########################################
+########################################
 
-#################### (Section) Preamble
-
-########## (Subsection) Packages
+#################### (Section) Packages
 
 import os
 os.system('clear')
@@ -11,25 +17,272 @@ import cv2
 import time
 import numpy as np
 import imutils
-from myfunctions import *
 from datetime import datetime
 from SecretColors.palette import Palette
 material = Palette("material",color_mode="rgb255")
 from termcolor import colored
 import matplotlib.pyplot as plt
 from tkinter import Tk
+from scipy.spatial.distance import pdist, squareform
+import seaborn
+
+#################### (Section) Figures
+
+########## (Subsection) Define clicking function
+
+def get_mouse_points(event, x, y, flags, param):
+    global mouse_x, mouse_y, mouse_pts
+    if event == cv2.EVENT_LBUTTONDOWN:
+        mouse_x, mouse_y = x, y
+        cv2.circle(frame, (x, y), int(frame_w/100), material.red(shade=50), -1)
+        if "mouse_pts" not in globals():
+            mouse_pts = []
+        mouse_pts.append((x, y))
+        print("Point marked")
+        print(x,y)
+
+########## (Subsection) Define point function
+
+def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh,heatmap_matrix, bird_height, bird_width):
+    frame_h = frame.shape[0]
+    frame_w = frame.shape[1]
+
+    ########## (Subsubsection)
+    node_radius = int(frame_w/100)
+    node_color = material.gray(shade=50)
+    node_thickness = -1
+    
+    background_color = material.gray(shade=90)
+    
+    hoop_radius = int(d_thresh)
+    hoop_color = material.gray(shade=50)
+    hoop_thickness = 5
+
+    violation_color = material.purple(shade=50)
+
+    line_thickness = 5
+    ##########################
+
+    blank_image = np.zeros(
+        (int(frame_h * scale_h), int(frame_w * scale_w), 3), np.uint8
+    )
+    blank_image[:] = background_color
+    warped_pts = []
+    
+    for i in range(len(pedestrian_boxes)):
+
+        mid_point_x = int(
+            (pedestrian_boxes[i][1] * frame_w + pedestrian_boxes[i][3] * frame_w) / 2
+        )
+        mid_point_y = int(
+            (pedestrian_boxes[i][0] * frame_h + pedestrian_boxes[i][2] * frame_h) / 2
+        )
+
+        print(mid_point_x,mid_point_y)
+
+        pts = np.array([[[mid_point_x, mid_point_y]]], dtype="float32")
+        warped_pt = cv2.perspectiveTransform(pts, M)[0][0]
+        warped_pt_scaled = [int(warped_pt[0] * scale_w), int(warped_pt[1] * scale_h)]
+
+        warped_pts.append(warped_pt_scaled)
+
+        bird_image = cv2.circle(
+            blank_image,
+            (warped_pt_scaled[0], warped_pt_scaled[1]),
+            hoop_radius,
+            hoop_color,
+            hoop_thickness,
+        )
+
+        bird_image = cv2.circle(
+            blank_image,
+            (warped_pt_scaled[0], warped_pt_scaled[1]),
+            node_radius,
+            node_color,
+            node_thickness,
+        )
+
+        p = np.array(warped_pts)
+        dist_condensed = pdist(p)
+        dist = squareform(dist_condensed)
+
+        pairs = len(dist_condensed)
+
+        dd = np.where((dist < d_thresh) & (dist > 0))
+        num_violations = int(len(dd[0])/2)
+
+        print(dd)
+
+        for node in range(len(dd[0])):
+
+            bird_image = cv2.circle(
+                blank_image,
+                (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]),
+                node_radius,
+                violation_color,
+                node_thickness,
+            )
+
+            bird_image = cv2.circle(
+                blank_image,
+                (warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]),
+                node_radius,
+                violation_color,
+                node_thickness,
+            )
+
+            cv2.line(
+                bird_image,
+                (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]),
+                (warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]),
+                violation_color,
+                line_thickness,
+            )
+
+            (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1])
+
+            warped_pt1 = np.array([[[warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]]]], dtype="float32")
+            warped_pt2 = np.array([[[warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]]]], dtype="float32")
+
+            original_pt1 = cv2.perspectiveTransform(warped_pt1, np.linalg.inv(M))[0][0]
+            original_pt2 = cv2.perspectiveTransform(warped_pt2, np.linalg.inv(M))[0][0]
+
+            cv2.circle(
+                frame,
+                (int(original_pt1[0]), int(original_pt1[1])),
+                node_radius,
+                violation_color,
+                node_thickness,
+            )
+
+            cv2.circle(
+                frame,
+                (int(original_pt2[0]), int(original_pt2[1])),
+                node_radius,
+                violation_color,
+                node_thickness,
+            )
+
+            cv2.line(
+                frame,
+                (int(original_pt1[0]), int(original_pt1[1])),
+                (int(original_pt2[0]), int(original_pt2[1])),
+                violation_color,
+                line_thickness,
+            )
+
+            violation_pt_x = original_pt1[0] - (original_pt1[0] - original_pt2[0])/2
+            violation_pt_y = original_pt1[1] - (original_pt1[1] - original_pt2[1])/2
+
+            print(f'Box: {i}')
+            print(f'Violation: {node}')
+
+            print(violation_pt_x, violation_pt_y)
+
+            interval = 10
+
+            width_classification = int(np.floor(interval*violation_pt_x/frame_w))
+            height_classification = int(np.floor(interval*violation_pt_y/frame_h))
+
+            print(width_classification,height_classification)
+            # cv2.waitKey(0)
+            
+            # width_classification1 = int(np.floor(interval*original_pt1[0]/frame_w))
+            # height_classification1 = int(np.floor(interval*original_pt1[1]/frame_h))
+
+            # width_classification2 = int(np.floor(interval*original_pt2[0]/frame_w))
+            # height_classification2 = int(np.floor(interval*original_pt2[1]/frame_h))
+
+            heatmap_matrix[height_classification, width_classification] += 1/4
+            # heatmap_matrix[height_classification2, width_classification2] += 1
+
+    cv2.imshow('Person recognition', frame)
+    cv2.imshow("Bird's-eye view", bird_image)
+    cv2.moveWindow("Bird's-eye view", int(screen_width/2), 0) 
+    cv2.waitKey(1)
+
+    return warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix, frame
+
+def get_camera_perspective(img, src_points):
+    IMAGE_H = img.shape[0]
+    IMAGE_W = img.shape[1]
+    src = np.float32(np.array(src_points))
+    dst = np.float32([[0, IMAGE_H], [IMAGE_W, IMAGE_H], [0, 0], [IMAGE_W, 0]])
+
+    M = cv2.getPerspectiveTransform(src, dst)
+    M_inv = cv2.getPerspectiveTransform(dst, src)
+
+    return M, M_inv
+
+# def put_text(frame, text, text_offset_y=25):
+#     font_scale = 0.8
+#     font = cv2.FONT_HERSHEY_SIMPLEX
+#     rectangle_bgr = (35, 35, 35)
+#     (text_width, text_height) = cv2.getTextSize(
+#         text, font, fontScale=font_scale, thickness=1
+#     )[0]
+#     # set the text start position
+#     text_offset_x = frame.shape[1] - 400
+#     # make the coords of the box with a small padding of two pixels
+#     box_coords = (
+#         (text_offset_x, text_offset_y + 5),
+#         (text_offset_x + text_width + 2, text_offset_y - text_height - 2),
+#     )
+#     frame = cv2.rectangle(
+#         frame, box_coords[0], box_coords[1], rectangle_bgr, cv2.FILLED
+#     )
+#     frame = cv2.putText(
+#         frame,
+#         text,
+#         (text_offset_x, text_offset_y),
+#         font,
+#         fontScale=font_scale,
+#         color=(255, 255, 255),
+#         thickness=1,
+#     )
+
+#     return frame, 2 * text_height + text_offset_y
+
+
+# def calculate_stay_at_home_index(total_pedestrians_detected, frame_num, fps):
+#     normally_people = 10
+#     pedestrian_per_sec = np.round(total_pedestrians_detected / frame_num, 1)
+#     sh_index = 1 - pedestrian_per_sec / normally_people
+#     return pedestrian_per_sec, sh_index
+
+
+# def plot_pedestrian_boxes_on_image(frame, pedestrian_boxes):
+#     frame_h = frame.shape[0]
+#     frame_w = frame.shape[1]
+#     thickness = 2
+#     # node_color = (192, 133, 156)
+#     node_color = (160, 48, 112)
+#     # color_10 = (80, 172, 110)
+
+#     for i in range(len(pedestrian_boxes)):
+#         pt1 = (
+#             int(pedestrian_boxes[i][1] * frame_w),
+#             int(pedestrian_boxes[i][0] * frame_h),
+#         )
+#         pt2 = (
+#             int(pedestrian_boxes[i][3] * frame_w),
+#             int(pedestrian_boxes[i][2] * frame_h),
+#         )
+
+#         frame_with_boxes = cv2.rectangle(frame, pt1, pt2, node_color, thickness)
+
+
+#     return frame_with_boxes
 
 ########## (Subsection) Grab screen dimensions
 
 screen_width = Tk().winfo_screenwidth()
 screen_height = Tk().winfo_screenheight()
-print(screen_width,screen_height)
 
 ########## (Subsection) Start timer
 
 start_time = datetime.now()
 print(''), print(colored('...','white')), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
-
 
 ########## (Subsection) Choose video
 
@@ -47,7 +300,7 @@ vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 ########## (Subsection) Choose clip region
 
 clip_start_s = 11
-clip_end_s = 15
+clip_end_s = 12
 
 clip_start = int(clip_start_s * vid_fps)
 clip_end = int(clip_end_s * vid_fps)
@@ -56,19 +309,6 @@ clip_end = int(clip_end_s * vid_fps)
 
 print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Initialisation')
 print(''), print(colored('...','white')), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Framerate: {} fps'.format(vid_fps)), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
-
-########## (Subsection) Define clicking function
-
-def get_mouse_points(event, x, y, flags, param):
-    global mouse_x, mouse_y, mouse_pts
-    if event == cv2.EVENT_LBUTTONDOWN:
-        mouse_x, mouse_y = x, y
-        cv2.circle(image, (x, y), 10, material.red(shade=50), 10)
-        if "mouse_pts" not in globals():
-            mouse_pts = []
-        mouse_pts.append((x, y))
-        print("Point marked")
-        print(x,y)
 
 ########## (Subsection) Initialise variables
 
@@ -122,16 +362,20 @@ for frame_idx in range(clip_start, clip_end + 1):
     vid_cap.set(1, frame_idx)
     (success, frame) = vid_cap.read()
     (frame_h, frame_w) = frame.shape[:2]
-
-    #################### (Section) Perspective
+    frame = cv2.resize(frame, (0, 0), fx=0.5*screen_width/frame_w, fy=0.5*screen_width/frame_w)
+    (frame_h, frame_w) = frame.shape[:2]
 
     if frame_idx == clip_start:
-        # Ask user to mark parallel points and two points 6 feet apart. Order bl, br, tr, tl, p1, p2
+
+        #################### (Section) Perspective
+        
         print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Perspective')
         print(''),print(colored('...','white')),print(''),print('Mark (Bottom left) → (Bottom right) → (Top left) → (Top right)'),print(''),print(colored('...','white')),print('')
+        
+        ########## (Subsection) Ask user to mark parallel points and two points 6 feet apart. Order bl, br, tr, tl, p1, p2
+
         while True:
-            image = frame
-            cv2.imshow("Perspective", image)
+            cv2.imshow("Perspective", frame)
             cv2.waitKey(1)
             if len(mouse_pts) == 7:
                 cv2.destroyWindow("Perspective")
@@ -139,7 +383,8 @@ for frame_idx in range(clip_start, clip_end + 1):
             first_frame_display = False
         four_points = mouse_pts
 
-        # Get perspective
+        ########## (Subsection) Get perspective
+
         M, Minv = get_camera_perspective(frame, four_points[0:4])
         pts = src = np.float32(np.array([four_points[4:]]))
         warped_pt = cv2.perspectiveTransform(pts, M)[0]
@@ -158,6 +403,8 @@ for frame_idx in range(clip_start, clip_end + 1):
 
         print(''),print(colored('...','white')),print(''),print(f'Threshold: {int(d_thresh)} px')
 
+    #################### (Section) Object detection
+
     confid = 0.5
     thresh = 0.5
 
@@ -174,8 +421,6 @@ for frame_idx in range(clip_start, clip_end + 1):
     blob = cv2.dnn.blobFromImage(
         frame_resized, 1 / 255.0, (416, 416), swapRB=True, crop=False)
     blobb = blob.reshape(blob.shape[2], blob.shape[3], 3)
-    # cv2.imshow('Blob', blobb)
-    # cv2.waitKey(2)
 
     net.setInput(blob)
     start = time.time()
@@ -211,8 +456,8 @@ for frame_idx in range(clip_start, clip_end + 1):
                     boxes_norm2.append([y_t/frame_h,x_l/frame_w,y_b/frame_h,x_r/frame_w])
                     confidences.append(float(confidence))
                     classIDs.append(classID)
+    
     idxs = cv2.dnn.NMSBoxes(boxes, confidences, confid, thresh)
-    # boxes = boxes[idxs.flatten()]
     boxes = np.array(boxes)[idxs.flatten()]
     boxes2 = np.array(boxes2)[idxs.flatten()]
     boxes_norm = np.array(boxes_norm)[idxs.flatten()]
@@ -266,32 +511,20 @@ for frame_idx in range(clip_start, clip_end + 1):
 
     pedestrian_boxes = boxes_norm2
     num_pedestrians = len(boxes_norm2)
-    # Detect person and bounding boxes using DNN
-    # pedestrian_boxes, num_pedestrians = DNN.detect_pedestrians(frame)
+
+    ########## (Subsection) Detect person and bounding boxes using DNN
 
     if len(pedestrian_boxes) > 0:
+
         print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing'), print(''), print(colored('...','white')), print('')
-        # pedestrian_detect = plot_pedestrian_boxes_on_image(frame, pedestrian_boxes)
+        
         warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix, frame = plot_points_on_bird_eye_view(
             frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh, heatmap_matrix, bird_height, bird_width
         )
-        # six_feet_violations, ten_feet_violations, pairs = plot_lines_between_nodes(
-        #     warped_pts, bird_image, d_thresh
-        # )
-        # plot_violation_rectangles(pedestrian_boxes, )
-
-        ###########################
-
-        ###########################
 
         num_violations_cumulative += num_violations
         num_pedestrians_cumulative += num_pedestrians
 
-        # total_six_feet_violations += violations / vid_fps
-        # abs_six_feet_violations += violations
-        # pedestrian_per_sec, sh_index = calculate_stay_at_home_index(
-        #     total_pedestrians_detected, frame_num, vid_fps
-        # )
         print(f'Pedestrians: {num_pedestrians} ({num_pedestrians_cumulative})')
         print(f'Pairs: {pairs}')
         print(f'Violating pairs: {dd}')
@@ -302,34 +535,13 @@ for frame_idx in range(clip_start, clip_end + 1):
         print(f'Violations: {round(num_violations_cumulative/frame_num,1)}')
         print(f'Pedestrians: {round(num_pedestrians_cumulative/frame_num,1)}')
 
-    # last_h = 75
-    # text = "# 6ft violations: " + str(int(total_six_feet_violations))
-    # pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
-
-    # text = "Stay-at-home Index: " + str(np.round(100 * sh_index, 1)) + "%"
-    # pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
-
-    # if total_pairs != 0:
-    #     sc_index = 1 - abs_six_feet_violations / total_pairs
-
-    # text = "Social-distancing Index: " + str(np.round(100 * sc_index, 1)) + "%"
-    # pedestrian_detect, last_h = put_text(pedestrian_detect, text, text_offset_y=last_h)
-
-    # uniform_data = np.random.rand(10, 10)
-    # print(uniform_data)
-    # seaborn.heatmap(uniform_data)
-    # plt.show()
-
-    # print(heatmap_matrix)
-
-    # cv2.imshow("Perspective", pedestrian_detect)
-    # output_movie.write(pedestrian_detect)
-    # bird_movie.write(bird_image)
-    # cv2.waitKey(0)
-
-    # plt.figure(figsize=[width,height])
+        print(heatmap_matrix)
+        cv2.waitKey(0)
 
 end_time = datetime.now()
 
+#################### (Section) Results 
+
+print(heatmap_matrix)
 seaborn.heatmap(heatmap_matrix)
 plt.show()
