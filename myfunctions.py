@@ -94,6 +94,7 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
     )
     blank_image[:] = background_color
     warped_pts = []
+    
     for i in range(len(pedestrian_boxes)):
 
         mid_point_x = int(
@@ -118,17 +119,18 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
         original_pt_scaled = cv2.perspectiveTransform(warped_pt_scaled2, np.linalg.inv(M))[0][0]
         print(f'original_pt_scaled: {original_pt_scaled}')
 
-        frame = cv2.circle(
-            frame,
-            (original_pt[0], original_pt[1]),
-            node_radius,
-            node_color,
-            node_thickness,
-        )
+        # cv2.circle(
+        #     frame,
+        #     (int(original_pt[0]), int(original_pt[1])),
+        #     node_radius,
+        #     violation_color,
+        #     node_thickness,
+        # )
 
         # if (any(i < 0 for i in warped_pt_scaled) or (warped_pt_scaled[0] > bird_height) or (warped_pt_scaled[1] > bird_width)):
         #     warped_pt_scaled = []
         # else:
+
         warped_pts.append(warped_pt_scaled)
         bird_image = cv2.circle(
             blank_image,
@@ -173,6 +175,10 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
                 node_thickness,
             )
 
+            # cv2.imshow("Bird's-eye view", bird_image)
+
+            # cv2.waitKey(0)
+
             cv2.line(
                 bird_image,
                 (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]),
@@ -181,10 +187,11 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
                 line_thickness,
             )
 
+            (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1])
+
             warped_pt1 = np.array([[[warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]]]], dtype="float32")
             warped_pt2 = np.array([[[warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]]]], dtype="float32")
-            warped_pt1 = np.array([[[357, 2199]]], dtype="float32")
-
+            # warped_pt1 = np.array([[[357, 2199]]], dtype="float32")
 
             original_pt1 = cv2.perspectiveTransform(warped_pt1, np.linalg.inv(M))[0][0]
             original_pt2 = cv2.perspectiveTransform(warped_pt2, np.linalg.inv(M))[0][0]
@@ -196,7 +203,7 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
                 frame,
                 (original_pt1[0], original_pt1[1]),
                 node_radius,
-                node_color,
+                violation_color,
                 node_thickness,
             )
 
@@ -204,28 +211,29 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
                 frame,
                 (original_pt2[0], original_pt2[1]),
                 node_radius,
-                node_color,
+                violation_color,
                 node_thickness,
             )
 
+            # cv2.waitKey(0)
 
-            # interval = 10
 
-            # height_value = warped_pts[dd[0][node]][0]
-            # width_value = warped_pts[dd[0][node]][1]
-
-            # print(height_value)
-            # print(width_value)
+            interval = 10
             
-            # width_classification = int(np.floor(interval*width_value/1920))
-            # height_classification = int(np.floor(interval*height_value/1080))
+            width_classification1 = int(np.floor(interval*original_pt1[0]/1920))
+            height_classification1 = int(np.floor(interval*original_pt1[1]/1080))
+
+            width_classification2 = int(np.floor(interval*original_pt2[0]/1920))
+            height_classification2 = int(np.floor(interval*original_pt2[1]/1080))
 
             # print(width_classification)
             # print(height_classification)
 
-            # heatmap_matrix[height_classification][width_classification] += 1
-            # # heatmap_matrix[height_classification,width_classification] += 1
+            heatmap_matrix[height_classification1][width_classification1] += 1
+            heatmap_matrix[height_classification2][width_classification2] += 1
+            # heatmap_matrix[height_classification,width_classification] += 1
 
+    cv2.imshow('Person recognition', frame)
     cv2.imshow("Bird's-eye view", bird_image)
     cv2.waitKey(1)
 

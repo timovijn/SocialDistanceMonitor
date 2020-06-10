@@ -26,7 +26,7 @@ vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/Rosmalen.MOV"
 
 clip_start_s = 11
-clip_end_s = 200
+clip_end_s = 15
 
 ##########################
 # from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
@@ -84,7 +84,7 @@ num_mouse_points = 0
 first_frame_display = True
 
 scale_w = 1 # 1.2 / 2
-scale_h = 2 # 4 / 2
+scale_h = 1 # 4 / 2
 
 SOLID_BACK_COLOR = material.gray(shade=90)
 
@@ -311,26 +311,16 @@ for frame_count in range(clip_start, clip_end + 1):
     # seaborn.heatmap(uniform_data)
     # plt.show()
 
-    # seaborn.heatmap(heatmap_matrix)
-    # plt.show()
-    # cv2.waitKey(2)
-    # plt.close()
-
     # print(heatmap_matrix)
 
     # cv2.imshow("Perspective", pedestrian_detect)
     # output_movie.write(pedestrian_detect)
     # bird_movie.write(bird_image)
-    cv2.waitKey(0)
+    # cv2.waitKey(0)
 
     # plt.figure(figsize=[width,height])
 
 end_time = datetime.now()
 
-print('')
-print(colored('...','white'))
-print('')
-print('Finished at {}'.format(end_time.strftime("%H:%M:%S")), '({})'.format(datetime.strptime(end_time.strftime("%H:%M:%S"), "%H:%M:%S") - datetime.strptime(start_time.strftime("%H:%M:%S"), "%H:%M:%S")))
-print('')
-print(colored('...','white'))
-print('')
+seaborn.heatmap(heatmap_matrix)
+plt.show()
