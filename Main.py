@@ -105,100 +105,97 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
         p = np.array(warped_pts)
         dist_condensed = pdist(p)
         dist = squareform(dist_condensed)
+        dist_triu = np.triu(dist)
 
-        pairs = len(dist_condensed)
+        pairs = len(dist_triu)
 
-        dd = np.where((dist < d_thresh) & (dist > 0))
-        num_violations = int(len(dd[0])/2)
+        dd = np.where((dist_triu < d_thresh) & (dist_triu > 0))
+        num_violations = len(dd[0])
 
         print(dd)
+        print(dd[0])
+        print(range(len(dd[0])))
 
-        for node in range(len(dd[0])):
+        if len(dd[0]) > 0:
 
-            bird_image = cv2.circle(
-                blank_image,
-                (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]),
-                node_radius,
-                violation_color,
-                node_thickness,
-            )
+            for node in range(len(dd[0])):
 
-            bird_image = cv2.circle(
-                blank_image,
-                (warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]),
-                node_radius,
-                violation_color,
-                node_thickness,
-            )
+                bird_image = cv2.circle(
+                    blank_image,
+                    (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]),
+                    node_radius,
+                    violation_color,
+                    node_thickness,
+                )
 
-            cv2.line(
-                bird_image,
-                (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]),
-                (warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]),
-                violation_color,
-                line_thickness,
-            )
+                bird_image = cv2.circle(
+                    blank_image,
+                    (warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]),
+                    node_radius,
+                    violation_color,
+                    node_thickness,
+                )
 
-            (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1])
+                cv2.line(
+                    bird_image,
+                    (warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]),
+                    (warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]),
+                    violation_color,
+                    line_thickness,
+                )
 
-            warped_pt1 = np.array([[[warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]]]], dtype="float32")
-            warped_pt2 = np.array([[[warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]]]], dtype="float32")
+                warped_pt1 = np.array([[[warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]]]], dtype="float32")
+                warped_pt2 = np.array([[[warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]]]], dtype="float32")
 
-            original_pt1 = cv2.perspectiveTransform(warped_pt1, np.linalg.inv(M))[0][0]
-            original_pt2 = cv2.perspectiveTransform(warped_pt2, np.linalg.inv(M))[0][0]
+                original_pt1 = cv2.perspectiveTransform(warped_pt1, np.linalg.inv(M))[0][0]
+                original_pt2 = cv2.perspectiveTransform(warped_pt2, np.linalg.inv(M))[0][0]
 
-            cv2.circle(
-                frame,
-                (int(original_pt1[0]), int(original_pt1[1])),
-                node_radius,
-                violation_color,
-                node_thickness,
-            )
+                cv2.circle(
+                    frame,
+                    (int(original_pt1[0]), int(original_pt1[1])),
+                    node_radius,
+                    violation_color,
+                    node_thickness,
+                )
 
-            cv2.circle(
-                frame,
-                (int(original_pt2[0]), int(original_pt2[1])),
-                node_radius,
-                violation_color,
-                node_thickness,
-            )
+                cv2.circle(
+                    frame,
+                    (int(original_pt2[0]), int(original_pt2[1])),
+                    node_radius,
+                    violation_color,
+                    node_thickness,
+                )
 
-            cv2.line(
-                frame,
-                (int(original_pt1[0]), int(original_pt1[1])),
-                (int(original_pt2[0]), int(original_pt2[1])),
-                violation_color,
-                line_thickness,
-            )
+                cv2.line(
+                    frame,
+                    (int(original_pt1[0]), int(original_pt1[1])),
+                    (int(original_pt2[0]), int(original_pt2[1])),
+                    violation_color,
+                    line_thickness,
+                )
 
-            violation_pt_x = original_pt1[0] - (original_pt1[0] - original_pt2[0])/2
-            violation_pt_y = original_pt1[1] - (original_pt1[1] - original_pt2[1])/2
+                violation_pt_x = original_pt1[0] - (original_pt1[0] - original_pt2[0])/2
+                violation_pt_y = original_pt1[1] - (original_pt1[1] - original_pt2[1])/2
 
-            print(f'Box: {i}')
-            print(f'Violation: {node}')
+                interval = 10
 
-            print(violation_pt_x, violation_pt_y)
+                width_classification = int(np.floor(interval*violation_pt_x/frame_w))
+                height_classification = int(np.floor(interval*violation_pt_y/frame_h))
 
-            interval = 10
+                # cv2.waitKey(0)
+                
+                # width_classification1 = int(np.floor(interval*original_pt1[0]/frame_w))
+                # height_classification1 = int(np.floor(interval*original_pt1[1]/frame_h))
 
-            width_classification = int(np.floor(interval*violation_pt_x/frame_w))
-            height_classification = int(np.floor(interval*violation_pt_y/frame_h))
+                # width_classification2 = int(np.floor(interval*original_pt2[0]/frame_w))
+                # height_classification2 = int(np.floor(interval*original_pt2[1]/frame_h))
 
-            print(width_classification,height_classification)
-            # cv2.waitKey(0)
-            
-            # width_classification1 = int(np.floor(interval*original_pt1[0]/frame_w))
-            # height_classification1 = int(np.floor(interval*original_pt1[1]/frame_h))
-
-            # width_classification2 = int(np.floor(interval*original_pt2[0]/frame_w))
-            # height_classification2 = int(np.floor(interval*original_pt2[1]/frame_h))
-
-            heatmap_matrix[height_classification, width_classification] += 1/4
-            # heatmap_matrix[height_classification2, width_classification2] += 1
-
+                heatmap_matrix[height_classification, width_classification] += 1
+                # heatmap_matrix[height_classification2, width_classification2] += 1
+                print(heatmap_matrix)
     cv2.imshow('Person recognition', frame)
     cv2.imshow("Bird's-eye view", bird_image)
-    cv2.moveWindow("Bird's-eye view", int(screen_width/2), 0) 
+    cv2.moveWindow("Bird's-eye view", int(screen_width/2), 0)
     cv2.waitKey(1)
 
     return warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix, frame
