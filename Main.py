@@ -41,6 +41,32 @@ def get_mouse_points(event, x, y, flags, param):
         print("Point marked")
         print(x,y)
 
+def heatmap(dd):
+    for violation in range(len(dd[0])):
+        violator1 = dd[0][violation]
+        violator2 = dd[1][violation]
+        mid_point_x1 = int(
+            (pedestrian_boxes[violator1][1] * frame_w + pedestrian_boxes[violator1][3] * frame_w) / 2
+        )
+        mid_point_y1 = int(
+            (pedestrian_boxes[violator1][0] * frame_h + pedestrian_boxes[violator1][2] * frame_h) / 2
+        )
+        mid_point_x2 = int(
+            (pedestrian_boxes[violator2][1] * frame_w + pedestrian_boxes[violator2][3] * frame_w) / 2
+        )
+        mid_point_y2 = int(
+            (pedestrian_boxes[violator2][0] * frame_h + pedestrian_boxes[violator2][2] * frame_h) / 2
+        )
+        violation_pt_x = mid_point_x1 - (mid_point_x1 - mid_point_x2)/2
+        violation_pt_y = mid_point_y1 - (mid_point_y1 - mid_point_y2)/2
+        interval = 10
+        width_classification = int(np.floor(interval*violation_pt_x/frame_w))
+        height_classification = int(np.floor(interval*violation_pt_y/frame_h))
+        print(width_classification,height_classification)
+        heatmap_matrix[height_classification, width_classification] += 1
+        
+    return heatmap_matrix
+
 ########## (Subsection) Define point function
 
 def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh,heatmap_matrix, bird_height, bird_width):
@@ -190,9 +216,9 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
                 # width_classification2 = int(np.floor(interval*original_pt2[0]/frame_w))
                 # height_classification2 = int(np.floor(interval*original_pt2[1]/frame_h))
 
-                heatmap_matrix[height_classification, width_classification] += 1
+                # heatmap_matrix[height_classification, width_classification] += 1
                 # heatmap_matrix[height_classification2, width_classification2] += 1
-                print(heatmap_matrix)
+                # print(heatmap_matrix)
     cv2.imshow('Person recognition', frame)
     cv2.imshow("Bird's-eye view", bird_image)
     cv2.moveWindow("Bird's-eye view", int(screen_width/2), 0)
@@ -522,6 +548,8 @@ for frame_idx in range(clip_start, clip_end + 1):
         num_violations_cumulative += num_violations
         num_pedestrians_cumulative += num_pedestrians
 
+        heatmap(dd)
+
         print(f'Pedestrians: {num_pedestrians} ({num_pedestrians_cumulative})')
         print(f'Pairs: {pairs}')
         print(f'Violating pairs: {dd}')
@@ -531,9 +559,6 @@ for frame_idx in range(clip_start, clip_end + 1):
         print(f'Frames: {frame_num}')
         print(f'Violations: {round(num_violations_cumulative/frame_num,1)}')
         print(f'Pedestrians: {round(num_pedestrians_cumulative/frame_num,1)}')
-
-        print(heatmap_matrix)
-        cv2.waitKey(0)
 
 end_time = datetime.now()
 
