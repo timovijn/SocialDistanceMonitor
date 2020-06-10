@@ -138,8 +138,10 @@ for frame_count in range(clip_start, clip_end + 1):
             (warped_pt[0][0] - warped_pt[1][0]) ** 2
             + (warped_pt[0][1] - warped_pt[1][1]) ** 2
         )
+        bird_height = frame_h * scale_h
+        bird_width = frame_w * scale_w
         bird_image = np.zeros(
-            (int(frame_h * scale_h), int(frame_w * scale_w), 3), np.uint8
+            (int(bird_height), int(bird_width), 3), np.uint8
         )
 
         bird_image[:] = SOLID_BACK_COLOR
@@ -250,6 +252,7 @@ for frame_count in range(clip_start, clip_end + 1):
     pts = np.array(
         [four_points[0], four_points[1], four_points[3], four_points[2]], np.int32
     )
+    print(pts)
     cv2.polylines(frame, [pts], True, (0, 255, 255), thickness=4)
 
     pedestrian_boxes = boxes_norm2
@@ -260,13 +263,17 @@ for frame_count in range(clip_start, clip_end + 1):
     if len(pedestrian_boxes) > 0:
         print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing'), print(''), print(colored('...','white')), print('')
         # pedestrian_detect = plot_pedestrian_boxes_on_image(frame, pedestrian_boxes)
-        warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix = plot_points_on_bird_eye_view(
-            frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh,heatmap_matrix
+        warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix, frame = plot_points_on_bird_eye_view(
+            frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh, heatmap_matrix, bird_height, bird_width
         )
         # six_feet_violations, ten_feet_violations, pairs = plot_lines_between_nodes(
         #     warped_pts, bird_image, d_thresh
         # )
         # plot_violation_rectangles(pedestrian_boxes, )
+
+        ###########################
+
+        ###########################
 
         num_violations_cumulative += num_violations
         num_pedestrians_cumulative += num_pedestrians
@@ -314,7 +321,7 @@ for frame_count in range(clip_start, clip_end + 1):
     # cv2.imshow("Perspective", pedestrian_detect)
     # output_movie.write(pedestrian_detect)
     # bird_movie.write(bird_image)
-    # cv2.waitKey(0)
+    cv2.waitKey(0)
 
     # plt.figure(figsize=[width,height])
 

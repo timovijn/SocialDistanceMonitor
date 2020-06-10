@@ -67,7 +67,7 @@ def plot_lines_between_nodes(warped_pts, bird_image, d_thresh):
     return six_feet_violations, ten_feet_violations, total_pairs
 
 
-def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh,heatmap_matrix):
+def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh,heatmap_matrix, bird_height, bird_width):
     frame_h = frame.shape[0]
     frame_w = frame.shape[1]
     # frame_h = 1
@@ -104,9 +104,31 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
         )
 
         pts = np.array([[[mid_point_x, mid_point_y]]], dtype="float32")
+        print(f'pts: {pts}')
         warped_pt = cv2.perspectiveTransform(pts, M)[0][0]
+        print(f'warped_pt {warped_pt}')
+        warped_pt2 = np.array([[[warped_pt[0], warped_pt[1]]]], dtype="float32")
+        # warped_pt2 = np.array([[[357, 2199]]], dtype="float32")
+        print(f'warped_pt2 {warped_pt2}')
+        original_pt = cv2.perspectiveTransform(warped_pt2, np.linalg.inv(M))[0][0]
+        print(f'original_pt: {original_pt}')
         warped_pt_scaled = [int(warped_pt[0] * scale_w), int(warped_pt[1] * scale_h)]
+        print(f'warped_pt_scaled {warped_pt_scaled}')
+        warped_pt_scaled2 = np.array([[[warped_pt_scaled[0], warped_pt_scaled[1]]]], dtype="float32")
+        original_pt_scaled = cv2.perspectiveTransform(warped_pt_scaled2, np.linalg.inv(M))[0][0]
+        print(f'original_pt_scaled: {original_pt_scaled}')
 
+        frame = cv2.circle(
+            frame,
+            (original_pt[0], original_pt[1]),
+            node_radius,
+            node_color,
+            node_thickness,
+        )
+
+        # if (any(i < 0 for i in warped_pt_scaled) or (warped_pt_scaled[0] > bird_height) or (warped_pt_scaled[1] > bird_width)):
+        #     warped_pt_scaled = []
+        # else:
         warped_pts.append(warped_pt_scaled)
         bird_image = cv2.circle(
             blank_image,
@@ -159,6 +181,34 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
                 line_thickness,
             )
 
+            warped_pt1 = np.array([[[warped_pts[dd[0][node]][0], warped_pts[dd[0][node]][1]]]], dtype="float32")
+            warped_pt2 = np.array([[[warped_pts[dd[1][node]][0], warped_pts[dd[1][node]][1]]]], dtype="float32")
+            warped_pt1 = np.array([[[357, 2199]]], dtype="float32")
+
+
+            original_pt1 = cv2.perspectiveTransform(warped_pt1, np.linalg.inv(M))[0][0]
+            original_pt2 = cv2.perspectiveTransform(warped_pt2, np.linalg.inv(M))[0][0]
+
+            print(f'Warped points: {warped_pt1},{warped_pt2}')
+            print(f'Original points: {original_pt1},{original_pt2}')
+
+            cv2.circle(
+                frame,
+                (original_pt1[0], original_pt1[1]),
+                node_radius,
+                node_color,
+                node_thickness,
+            )
+
+            cv2.circle(
+                frame,
+                (original_pt2[0], original_pt2[1]),
+                node_radius,
+                node_color,
+                node_thickness,
+            )
+
+
             # interval = 10
 
             # height_value = warped_pts[dd[0][node]][0]
@@ -179,7 +229,7 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
     cv2.imshow("Bird's-eye view", bird_image)
     cv2.waitKey(1)
 
-    return warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix
+    return warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix, frame
 
 
 def get_camera_perspective(img, src_points):
