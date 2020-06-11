@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 from tkinter import Tk
 from scipy.spatial.distance import pdist, squareform
 import seaborn
+from PIL import Image
 
 #################### (Section) Figures
 
@@ -62,7 +63,6 @@ def heatmap(dd):
         interval = 10
         width_classification = int(np.floor(interval*violation_pt_x/frame_w))
         height_classification = int(np.floor(interval*violation_pt_y/frame_h))
-        print(width_classification,height_classification)
         heatmap_matrix[height_classification, width_classification] += 1
         
     return heatmap_matrix
@@ -82,7 +82,7 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
     
     hoop_radius = int(d_thresh)
     hoop_color = material.gray(shade=50)
-    hoop_thickness = 5
+    hoop_thickness = int(node_radius/2)
 
     violation_color = material.purple(shade=50)
 
@@ -103,8 +103,6 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
         mid_point_y = int(
             (pedestrian_boxes[i][0] * frame_h + pedestrian_boxes[i][2] * frame_h) / 2
         )
-
-        print(mid_point_x,mid_point_y)
 
         pts = np.array([[[mid_point_x, mid_point_y]]], dtype="float32")
         warped_pt = cv2.perspectiveTransform(pts, M)[0][0]
@@ -137,10 +135,6 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
 
         dd = np.where((dist_triu < d_thresh) & (dist_triu > 0))
         num_violations = len(dd[0])
-
-        print(dd)
-        print(dd[0])
-        print(range(len(dd[0])))
 
         if len(dd[0]) > 0:
 
@@ -219,8 +213,8 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
                 # heatmap_matrix[height_classification, width_classification] += 1
                 # heatmap_matrix[height_classification2, width_classification2] += 1
                 # print(heatmap_matrix)
-    persrec = cv2.imshow('Person recognition', frame)
-    birdseye = cv2.imshow("Bird's-eye view", bird_image)
+    cv2.imshow('Person recognition', frame)
+    cv2.imshow("Bird's-eye view", bird_image)
     cv2.moveWindow("Bird's-eye view", int(screen_width/2), 0)
     cv2.waitKey(1)
 
@@ -390,6 +384,8 @@ for frame_idx in range(clip_start, clip_end + 1):
 
     if frame_idx == clip_start:
 
+        cv2.imwrite("frame.png", frame)
+
         #################### (Section) Perspective
         
         print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Perspective')
@@ -529,7 +525,6 @@ for frame_idx in range(clip_start, clip_end + 1):
     pts = np.array(
         [four_points[0], four_points[1], four_points[3], four_points[2]], np.int32
     )
-    print(pts)
     cv2.polylines(frame, [pts], True, (0, 255, 255), thickness=4)
 
     pedestrian_boxes = boxes_norm2
@@ -561,24 +556,24 @@ for frame_idx in range(clip_start, clip_end + 1):
         print(f'Pedestrians: {round(num_pedestrians_cumulative/frame_num,1)}')
 
 end_time = datetime.now()
+print(''), print(colored('...','white')), print(''), print(f'Ended at {end_time.strftime("%H:%M:%S")} ({end_time-start_time})'),print(''), print(colored('...','white')), print('')
 
-#################### (Section) Results 
+#################### (Section) Results
 
 ########## (Subsection) Heatmap
 
 fig = plt.figure(figsize=(1, 1))
 dpi = fig.get_dpi()
+plt.close()
 fig = plt.figure(figsize=(frame_w/float(dpi),frame_h/float(dpi)))
 ax = plt.Axes(fig, [0., 0., 1., 1.])
 ax.set_axis_off()
 fig.add_axes(ax)
 seaborn.heatmap(heatmap_matrix, cbar = False)
-plt.show()
 plt.savefig("./heatmap.png")
 
-# fin = cv2.addWeighted(fig, 0.7, 'Person recognition', 0.3, 0)
-# cv2.imshow('Person recognition', fin)
+combined = cv2.addWeighted(cv2.imread("./heatmap.png"), 0.5, cv2.imread("./frame.png"), 0.5, 0)
 
-# hm = cv2.imread('heatmap.png')
-# added_image = cv2.addWeighted(persrec,0.4,hm,0.1,0)
-# cv2.imwrite('combined.png', added_image)
+cv2.imwrite("./combined.png", combined)
+cv2.imshow('Heatmap', combined)
+cv2.waitKey(0)
