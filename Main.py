@@ -556,6 +556,18 @@ for frame_idx in range(clip_start, clip_end + 1):
         print(f'Violations: {round(num_violations_cumulative/frame_num,1)}')
         print(f'Pedestrians: {round(num_pedestrians_cumulative/frame_num,1)}')
 
+        if ((frame_num % 10 == 0) and (frame_num > 0)):
+            print('print')
+            fig = plt.figure(figsize=(1, 1))
+            dpi = fig.get_dpi()
+            plt.close()
+            fig = plt.figure(figsize=(frame_w/float(dpi),frame_h/float(dpi)))
+            ax = plt.Axes(fig, [0., 0., 1., 1.])
+            ax.set_axis_off()
+            fig.add_axes(ax)
+            seaborn.heatmap(heatmap_matrix, cbar = False)
+            plt.savefig("./heatmap.png")
+
 end_time = datetime.now()
 print(''), print(colored('...','white')), print(''), print(f'Ended at {end_time.strftime("%H:%M:%S")} ({end_time-start_time})'),print(''), print(colored('...','white')), print('')
 
