@@ -316,11 +316,12 @@ vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
 ########## (Subsection) Choose clip region
 
-clip_start_s = 11
-clip_end_s = 11.2
+clip_start_s = 0
+clip_end_s = 10
 
 clip_start = int(clip_start_s * vid_fps)
 clip_end = int(clip_end_s * vid_fps)
+clip_duration = clip_end - clip_start + 1
 
 ########## (Subsection) Print video information
 
@@ -374,7 +375,7 @@ for frame_idx in range(clip_start, clip_end + 1):
     if frame_idx > clip_end:
         break
 
-    print(''), print(colored('...','white')), print(''), print(colored('New frame', 'green'),f'{frame_idx} ({clip_start} → {clip_end}) ({frame_num})')
+    print(''), print(colored('...','white')), print(''), print(colored('New frame', 'green'),f'{frame_idx} ({clip_start} → {clip_end}) ({frame_num} of {clip_duration}) ({int(100*frame_num/clip_duration)}%)')
 
     vid_cap.set(1, frame_idx)
     (success, frame) = vid_cap.read()
