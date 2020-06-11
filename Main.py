@@ -219,8 +219,8 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
                 # heatmap_matrix[height_classification, width_classification] += 1
                 # heatmap_matrix[height_classification2, width_classification2] += 1
                 # print(heatmap_matrix)
-    cv2.imshow('Person recognition', frame)
-    cv2.imshow("Bird's-eye view", bird_image)
+    persrec = cv2.imshow('Person recognition', frame)
+    birdseye = cv2.imshow("Bird's-eye view", bird_image)
     cv2.moveWindow("Bird's-eye view", int(screen_width/2), 0)
     cv2.waitKey(1)
 
@@ -323,7 +323,7 @@ vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 ########## (Subsection) Choose clip region
 
 clip_start_s = 11
-clip_end_s = 12
+clip_end_s = 11.2
 
 clip_start = int(clip_start_s * vid_fps)
 clip_end = int(clip_end_s * vid_fps)
@@ -564,6 +564,21 @@ end_time = datetime.now()
 
 #################### (Section) Results 
 
-print(heatmap_matrix)
-seaborn.heatmap(heatmap_matrix)
+########## (Subsection) Heatmap
+
+fig = plt.figure(figsize=(1, 1))
+dpi = fig.get_dpi()
+fig = plt.figure(figsize=(frame_w/float(dpi),frame_h/float(dpi)))
+ax = plt.Axes(fig, [0., 0., 1., 1.])
+ax.set_axis_off()
+fig.add_axes(ax)
+seaborn.heatmap(heatmap_matrix, cbar = False)
 plt.show()
+plt.savefig("./heatmap.png")
+
+# fin = cv2.addWeighted(fig, 0.7, 'Person recognition', 0.3, 0)
+# cv2.imshow('Person recognition', fin)
+
+# hm = cv2.imread('heatmap.png')
+# added_image = cv2.addWeighted(persrec,0.4,hm,0.1,0)
+# cv2.imwrite('combined.png', added_image)
