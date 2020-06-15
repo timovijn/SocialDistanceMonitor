@@ -1,5 +1,3 @@
-# SocialDistancePedestrian
-
 # Blog post
 
 ![Blog%20post%207d35bd1776c6429bb1f55d258b90a908/Screenshot_2020-06-15_at_11.37.02.png](Blog%20post%207d35bd1776c6429bb1f55d258b90a908/Screenshot_2020-06-15_at_11.37.02.png)
@@ -10,13 +8,13 @@
 
 # Introduction
 
-**Problem to solve / Relevant example / Extensibility to other domains / Summary of result / Clear hypothesis and problem statement / Requirements**
+**Problem to solve • Relevant example • Extensibility to other domains • Summary of result • Clear hypothesis and problem statement • Requirements**
 
 With the rise of the COVID-19 pandemic, society calls for innovative solutions to solve the emerging problems and aid humanity in dealing with the new life standards and regulations. One of these regulations is that of social distancing, where civilians are asked to not get any closer to each other than a by government predefined distance. As the goal is to reduce the total amount of COVID-19 contaminations, the need for an application that can show where and how often the regulations are violated is high. This blog post comprises of a tool that evaluates recordings of surveillance cameras and then presents the total amount of violations and the locations where the majority of these violations occur. This way, authorities can adjust the spatial planning accordingly, with the goal to reduce the chance that COVID-19 is spread within their region. For this application to be useful, it should adhere to the following requirements: 
 
 - The runtime of the algorithm on a single frame should be lower than 0.5 sec.
 - The accuracy of distance detection should be higher than 90%.
-- It should be robust in the sense that the program handles a variety of crowds, perspectives, resolutions, lighting conditions and environmental differences. To measure this, 10 clips are carefully selected as presented in the method section.
+- It should be robust in the sense that the program handles a variety of crowds, perspectives, resolutions, lighting conditions and environmental differences. To measure this, 10 clips containing these different conditions are carefully selected as presented in the method section.
 - The operating time should be limited to a 1 time setup with a duration less than 10 minutes.
 - The tool should be user-friendly in the sense that it easy to operate and also outputs a variety of data.
 
@@ -24,13 +22,13 @@ This tool was developed during times of the COVID-19 epidemic, however its use i
 
 # Related Work
 
-**Other implementations / Underlying principles / YOLO**
+**Other implementations • Underlying principles • YOLO**
 
-For this tool to be completed, inspiration was taken from existing variants and techniques were used to execute specific steps in the program. The other implementations and underlying principles will be set out below: 
+For this tool to be completed, inspiration was taken from existing variants and widely used techniques were used to execute specific steps in the program. The other implementations and underlying principles will be set out below: 
 
 ### Other Implementations
 
-Landing AI, a famous start-up in the field of Artificial Intelligence, build a [social distancing detector](https://landing.ai/landing-ai-creates-an-ai-tool-to-help-customers-monitor-social-distancing-in-the-workplace/). The detector works roughly the same as the one presented in this blog p, as they use the same input and evaluate the violations from a bird's-eye perspective. Where the algorithms differ is in the sense of object detection. Landing AI uses Faster R-CNN, where our program uses YOLOv3, which will be explained later. This tool does only show the violations as opposed by our tool, where the locations are also given as output. 
+- Landing AI, a famous start-up in the field of Artificial Intelligence, build a [social distancing detector](https://landing.ai/landing-ai-creates-an-ai-tool-to-help-customers-monitor-social-distancing-in-the-workplace/). The detector works roughly the same as the one presented in this blog post, as they use the video surveillance input, detect pedestrians and evaluate the social distancing violations from a bird's-eye perspective. Where the algorithms differ is in the sense of object detection. Landing AI uses Faster R-CNN, where our program uses YOLOv3, which will be explained later. Landing AI's tool does only show the violations as opposed by our tool, where the locations of occurrence are also given as output.
 
 During the duration of this project, a few others were introduced
 
@@ -38,9 +36,13 @@ During the duration of this project, a few others were introduced
 
 Object detection is done by the *[You Only Look Once](https://pjreddie.com/darknet/yolo/)* (YOLO) object detection system. This system requires three files: (1) a weight file; (2) a configuration file; and (3) a name file.
 
+### Libraries
+
+Open CV
+
 # Methods
 
-**Step-by-step walkthrough of algorithm components (visualisation) / Motivation with reference to hypothesis and problem statement**
+**Step-by-step walkthrough of algorithm components (visualisation) • Motivation with reference to hypothesis and problem statement**
 
 The *SocialDistancingPedestrian* algorithm consists of a number of constituent parts that will be explained separately in an input-to-output manner.
 
@@ -91,12 +93,14 @@ To obtain (output) person locations in 3D from (input) a processed video frame, 
 
 As stated before, object detection is implemented through the YOLO object detection system. The three required files are stored locally to allow configuration before being loaded for the algorithm to use. The processed frame from one step earlier is further processed by `blob = cv2.dnn.blobFromImage()`. In our case, this function is used to create a 4-dimensional blob from the frame with swapped Blue and Red channels.
 
-At this point, the artificial network can be initialised by `net = cv2.dnn.readNetFromDarknet()` which takes the weight file and configuration file as input. The input to this network is then set by `net.setInput()` and layer outputs are obtained by `net.forward()`.
+The artificial network is initialised by `net = cv2.dnn.readNetFromDarknet()` which takes the weight file and configuration file as input. The input to this network is then set by `net.setInput()` and layer outputs are obtained by `net.forward()`. This output is used to determine bounding boxes of the objects that have been detected to be of class ‘person’ with a confidence value of at least a user set value.
+
+## (3) Perspective change
 
 # Experiments & Data
 
-**What type of data / Data source / How much data / Preprocessing steps / Explicit experiments (Experiment description → Hypothesis → Result) / Performance / Robustness / Ablation study / Shortcomings**
+**What type of data • Data source • How much data • Preprocessing steps • Explicit experiments (Experiment description → Hypothesis → Result) / Performance / Robustness • Ablation study • Shortcomings**
 
 # Conclusion
 
-**Summary / Learning curve / Future work**
+**Summary • Learning curve • Future work**
