@@ -49,7 +49,13 @@ The overarching goal of the algorithm is to provide the user with insightful ind
 
 When we descend into the lower levels of the algorithm, the constituent parts in the table below can be considered separately. The algorithm progresses through these phases for every frame of a video separately and linearly.
 
-[Untitled](https://www.notion.so/5f97ba769d9b47269c82fdce862f66bb)
+| Input                   | Phase                   | Output                          |
+|-------------------------|-------------------------|---------------------------------|
+| Raw video footage →     | (1) Video processing    | → Processed video frame         |
+| Processed video frame → | (2) Object detection    | → Person locations (3D)         |
+| Person locations (3D) → | (3) Perspective change  | → Person locations (2D)         |
+| Person locations (2D) → | (4) Violation detection | → Violations                    |
+| Violations →            | (5) Indicators          | → Indicators and visualisations |
 
 ## (1) **Video processing**
 
