@@ -59,7 +59,7 @@ Block diagram indicating the individual phases of the Social Distance Monitor
 
 [Using Python to Monitor Social Distancing in a Public Area](https://towardsdatascience.com/monitoring-social-distancing-using-ai-c5b81da44c9f)
 
-![](/Blog/Images/Phases.eps | width=100)
+![Phases](/Blog/Images/Phases.eps | width=100)
 
 ### (Phase 1) **Video processing**
 
