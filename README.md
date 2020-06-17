@@ -24,7 +24,7 @@ This tool was developed during times of the COVID-19 epidemic, however its use i
 
 **Other implementations • Underlying principles • YOLO**
 
-To go from idea to a working tool, inspiration was taken from existing variants and widely used techniques were used to execute specific phases in the program such as the YOLO neural network to detect pedestrians. These other implementations and underlying principles will be set out below. 
+To go from idea to a working tool, inspiration was taken from existing variants and widely used techniques were used to execute specific phases in the program such as the YOLO neural network to detect pedestrians. These other implementations and underlying principles will be set out below.
 
 ### Other Implementations
 
@@ -51,20 +51,15 @@ The overarching goal of the algorithm is to provide the user with insightful ind
 
 When we descend into a more detailed level, the algorithm’s phases shown in the table below can be considered separately. The algorithm progresses through these phases for every frame of a video separately and linearly.
 
-[Untitled](https://www.notion.so/5f97ba769d9b47269c82fdce862f66bb)
+| Input | Phase | Output |
+|-------------------------|-------------------------|---------------------------------|
+| Raw video footage → | (1) Video processing | → Processed video frame |
+| Processed video frame → | (2) Object detection | → Person locations (3D) |
+| Person locations (3D) → | (3) Perspective change | → Person locations (2D) |
+| Person locations (2D) → | (4) Violation detection | → Violations |
+| Violations → | (5) Indicators | → Indicators and visualisations |
 
-![Social%20Distance%20Monitor%207d35bd1776c6429bb1f55d258b90a908/Block_diagram_phases.png](Social%20Distance%20Monitor%207d35bd1776c6429bb1f55d258b90a908/Block_diagram_phases.png)
-
-Block diagram indicating the individual phases of the Social Distance Monitor
-
-[Using Python to Monitor Social Distancing in a Public Area](https://towardsdatascience.com/monitoring-social-distancing-using-ai-c5b81da44c9f)
-
-![Phases](/Blog/Images/Phases.eps | width=100)
-
-![MovingOutput](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/MovingOutput.gif?raw=true)
-![Phases](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/Phases.eps?raw=true)
-
-
+![Phases](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/Phases.svg?raw=true)
 
 ### (Phase 1) **Video processing**
 
@@ -115,7 +110,7 @@ The phase to change perspective is to obtain a top view (bird’s eye view) of t
 
 At the foundation of this phase is `cv2.perspectiveTransform()`, a function that requires two equal-sized source and destination arrays to determine the transformation matrix. The source or “to-be-transformed’ array is obtained manually. At the start of the algorithm, there is a popup that directs the user to mark four points that indicate the perspective of the scene. These points are then used as source array. After obtaining the transformation matrix, it is straightforward to map the centre point of the bounding box of a person from the original 3D view to a “warped” centre point on the 2D bird’s eye view.
 
-![Social%20Distance%20Monitor%207d35bd1776c6429bb1f55d258b90a908/SocialDistancePedestrian.gif](Social%20Distance%20Monitor%207d35bd1776c6429bb1f55d258b90a908/SocialDistancePedestrian.gif)
+![MovingOutput](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/MovingOutput.gif?raw=true)
 
 ### (Phase 4) Violation detection
 
@@ -129,9 +124,9 @@ To obtain (output) indicators from (input) violations, the algorithm contains ph
 
 One of the most informative visualisations is that of the Violation Heatmap, which exactly fits the original scene. To establish this heatmap, the centre-point of a violation – that is, the point that is exactly in between two people that are in violation – is recorded as a violation.
 
-![Social%20Distance%20Monitor%207d35bd1776c6429bb1f55d258b90a908/heatmap.png](Social%20Distance%20Monitor%207d35bd1776c6429bb1f55d258b90a908/heatmap.png)
+![Heatmap](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/Heatmap.png?raw=true)
 
-![Social%20Distance%20Monitor%207d35bd1776c6429bb1f55d258b90a908/combined.png](Social%20Distance%20Monitor%207d35bd1776c6429bb1f55d258b90a908/combined.png)
+![HeatmapOverlay](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/HeatmapOverlay.png?raw=true)
 
 ## Training YOLO for person detection
 
@@ -145,15 +140,15 @@ One of the most informative visualisations is that of the Violation Heatmap, whi
 
 ### Input Data
 
-In order to build the social distance monitor a variety of data was used. First of all, the input of the program is a video (mostly from surveillance cameras). For these videos as input data, footage from a variety of video datasets was used. The goal was to select a range of videos with differing characteristics such as lighting, amount of pedestrians, perspectives and surrounding objects in the environment. The selection of these videos was done manually with careful consideration. Footage from the following datasets was used: [Oxford Town Centre](https://megapixels.cc/oxford_town_centre/), [CAVIAR](http://homepages.inf.ed.ac.uk/rbf/CAVIARDATA1/), [Virat Video Dataset](https://viratdata.org/), [EPFL](https://www.epfl.ch/labs/cvlab/data/data-pom-index-php/) and an additional test video was provided by [BriefCam](https://www.youtube.com/watch?v=aUdKzb4LGJI). 
+In order to build the social distance monitor a variety of data was used. First of all, the input of the program is a video (mostly from surveillance cameras). For these videos as input data, footage from a variety of video datasets was used. The goal was to select a range of videos with differing characteristics such as lighting, amount of pedestrians, perspectives and surrounding objects in the environment. The selection of these videos was done manually with careful consideration based on the previously mentioned criteria. Footage from the following datasets was used: [Oxford Town Centre](https://megapixels.cc/oxford_town_centre/), [CAVIAR](http://homepages.inf.ed.ac.uk/rbf/CAVIARDATA1/), [Virat Video Dataset](https://viratdata.org/), [EPFL](https://www.epfl.ch/labs/cvlab/data/data-pom-index-php/) and an additional test video was provided by [BriefCam](https://www.youtube.com/watch?v=aUdKzb4LGJI).
 
 ### Data for object detection
 
-As this is the data used as input of the program, it is not used in building the tool. For the different phases, different datasets were used to be able to get an accurate and working tool. For person recognition, this can be split up in two parts, being the data used for the pre-trained weights of the YOLO network and the data used for the self-trained YOLO network. 
+As this is the data used as input of the program, it is not used in building the tool. For the different phases, different datasets were used to be able to get an accurate and working tool. For person recognition, this can be split up in two parts, being the data used for the pre-trained weights of the YOLO network and the data used for the self-trained YOLO network.
 
-The **COCO-dataset** was used to train and craft the original YOLO network
+The **[COCO-dataset](http://cocodataset.org/)** was used to train and craft the original YOLO network.
 
-For the custom self-trained variant of the YOLO network, the **Caltech dataset** was introduced
+For the custom self-trained variant of the YOLO network, the **[Caltech Pedestrian Dataset](http://www.vision.caltech.edu/Image_Datasets/CaltechPedestrians/)** was introduced. This is the largest pedestrian dataset available. It consists of 250,000 individual frames.
 
 ## Performance and robustness experiments
 

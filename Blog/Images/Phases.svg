@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1500 500" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="Artboard1" transform="matrix(0.912409,0,0,1.94553,-20.073,-278.21)">
+        <rect x="22" y="143" width="1644" height="257" style="fill:none;"/>
+        <g transform="matrix(2.56875,0,0,0.152296,36.5562,212.618)">
+            <rect x="69" y="120" width="480" height="27" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(2.055,0,0,0.152296,318.605,289.718)">
+            <rect x="69" y="120" width="480" height="27" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(0.0182667,0,0,3.28389,1441.16,-159.832)">
+            <rect x="69" y="120" width="480" height="27" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(0.740541,0,0,0.347297,99.7568,144.389)">
+            <circle cx="154" cy="255" r="37" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,41.728,139.402)">
+            <text x="109.805px" y="178.923px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:20.833px;">Raw video</text>
+            <text x="121.478px" y="199.756px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:20.833px;">f<tspan x="128.12px " y="199.756px ">o</tspan>ot<tspan x="158.2px " y="199.756px ">a</tspan>ge</text>
+        </g>
+        <g transform="matrix(0.957205,0,0,0.372464,211.048,158.085)">
+            <path d="M375,166.5C375,147.459 362.174,132 346.375,132L174.625,132C158.826,132 146,147.459 146,166.5L146,235.5C146,254.541 158.826,270 174.625,270L346.375,270C362.174,270 375,254.541 375,235.5L375,166.5Z" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(6.21395e-17,0.475926,-1.01481,2.91421e-17,595.878,66.138)">
+            <path d="M350.5,228L364,255L337,255L350.5,228Z" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,288.328,139.402)">
+            <text x="125.06px" y="178.307px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:25px;">V<tspan x="141.344px " y="178.307px ">i</tspan>deo</text>
+            <text x="95.971px" y="203.307px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:25px;">pr<tspan x="118.505px " y="203.307px ">o</tspan>cessing</text>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,288.328,113.702)">
+            <text x="128.627px" y="162.872px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:16.667px;">Phase 1</text>
+        </g>
+        <g transform="matrix(0.740541,0,0,0.347297,592.957,144.389)">
+            <circle cx="154" cy="255" r="37" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,534.928,139.402)">
+            <text x="108.396px" y="178.923px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:20.833px;">Pr<tspan x="127.713px " y="178.923px ">o</tspan>cessed</text>
+            <text x="102.872px" y="199.756px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:20.833px;">video fr<tspan x="171.303px " y="199.756px ">a</tspan>me</text>
+        </g>
+        <g transform="matrix(0.957205,0,0,0.372464,704.248,158.085)">
+            <path d="M375,166.5C375,147.459 362.174,132 346.375,132L174.625,132C158.826,132 146,147.459 146,166.5L146,235.5C146,254.541 158.826,270 174.625,270L346.375,270C362.174,270 375,254.541 375,235.5L375,166.5Z" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(6.21395e-17,0.475926,-1.01481,2.91421e-17,1089.08,66.138)">
+            <path d="M350.5,228L364,255L337,255L350.5,228Z" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,781.528,139.402)">
+            <text x="120.043px" y="178.307px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:25px;">Object</text>
+            <text x="104.607px" y="203.307px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:25px;">det<tspan x="140.74px " y="203.307px ">e</tspan>ction</text>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,781.528,113.702)">
+            <text x="127.605px" y="162.872px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:16.667px;">Phase 2</text>
+        </g>
+        <g transform="matrix(0.740541,0,0,0.347297,1086.16,144.389)">
+            <circle cx="154" cy="255" r="37" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,1028.13,139.402)">
+            <text x="124.926px" y="178.923px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:20.833px;">P<tspan x="137.082px " y="178.923px ">e</tspan>rson</text>
+            <text x="91.906px" y="199.756px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:20.833px;">locations (3D)</text>
+        </g>
+        <g transform="matrix(0.957205,0,0,0.372464,1197.45,158.085)">
+            <path d="M375,166.5C375,147.459 362.174,132 346.375,132L174.625,132C158.826,132 146,147.459 146,166.5L146,235.5C146,254.541 158.826,270 174.625,270L346.375,270C362.174,270 375,254.541 375,235.5L375,166.5Z" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(6.21395e-17,0.475926,-1.01481,2.91421e-17,1582.28,66.138)">
+            <path d="M350.5,228L364,255L337,255L350.5,228Z" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,1274.73,139.402)">
+            <text x="91.912px" y="178.307px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:25px;">P<tspan x="106.5px " y="178.307px ">e</tspan>rspectiv<tspan x="208.599px " y="178.307px ">e</tspan></text>
+            <text x="115.722px" y="203.307px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:25px;">change</text>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,1274.73,113.702)">
+            <text x="127.386px" y="162.872px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:16.667px;">Phase 3</text>
+        </g>
+        <g transform="matrix(0.740541,0,0,0.347297,1332.76,221.489)">
+            <circle cx="154" cy="255" r="37" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,1274.73,216.502)">
+            <text x="124.926px" y="178.923px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:20.833px;">P<tspan x="137.082px " y="178.923px ">e</tspan>rson</text>
+            <text x="92.181px" y="199.756px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:20.833px;">locations (2D)</text>
+        </g>
+        <g transform="matrix(0.957205,0,0,0.372464,950.848,235.185)">
+            <path d="M375,166.5C375,147.459 362.174,132 346.375,132L174.625,132C158.826,132 146,147.459 146,166.5L146,235.5C146,254.541 158.826,270 174.625,270L346.375,270C362.174,270 375,254.541 375,235.5L375,166.5Z" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(6.21395e-17,-0.475926,1.01481,2.91421e-17,1064.72,476.862)">
+            <path d="M350.5,228L364,255L337,255L350.5,228Z" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,1028.13,216.502)">
+            <text x="108.593px" y="178.307px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:25px;">V<tspan x="124.877px " y="178.307px ">i</tspan>olation</text>
+            <text x="104.607px" y="203.307px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:25px;">det<tspan x="140.74px " y="203.307px ">e</tspan>ction</text>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,1028.13,267.902)">
+            <text x="127.251px" y="162.872px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:16.667px;">Phase 4</text>
+        </g>
+        <g transform="matrix(0.740541,0,0,0.347297,839.557,221.489)">
+            <circle cx="154" cy="255" r="37" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,781.528,216.502)">
+            <text x="111.488px" y="189.339px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:20.833px;">V<tspan x="125.058px " y="189.339px ">i</tspan>olations</text>
+        </g>
+        <g transform="matrix(0.957205,0,0,0.372464,457.648,235.185)">
+            <path d="M375,166.5C375,147.459 362.174,132 346.375,132L174.625,132C158.826,132 146,147.459 146,166.5L146,235.5C146,254.541 158.826,270 174.625,270L346.375,270C362.174,270 375,254.541 375,235.5L375,166.5Z" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(6.21395e-17,-0.475926,1.01481,2.91421e-17,571.522,476.862)">
+            <path d="M350.5,228L364,255L337,255L350.5,228Z" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,534.928,216.502)">
+            <text x="102.026px" y="190.807px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:25px;">Indicat<tspan x="177.026px " y="190.807px ">o</tspan>rs</text>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,534.928,267.902)">
+            <text x="127.431px" y="162.872px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:16.667px;">Phase 5</text>
+        </g>
+        <g transform="matrix(0.740541,0,0,0.347297,346.357,221.489)">
+            <circle cx="154" cy="255" r="37" style="fill:rgb(235,235,235);"/>
+        </g>
+        <g transform="matrix(1.096,0,0,0.514,288.328,216.502)">
+            <text x="101.916px" y="178.923px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:20.833px;">Indicat<tspan x="164.416px " y="178.923px ">o</tspan>rs &amp;</text>
+            <text x="94.709px" y="199.756px" style="font-family:'SFProDisplay-Semibold', 'SF Pro Display';font-weight:600;font-size:20.833px;">visualisations</text>
+        </g>
+    </g>
+</svg>
