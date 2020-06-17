@@ -317,7 +317,7 @@ vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 ########## (Subsection) Choose clip region
 
 clip_start_s = 5
-clip_end_s = 15
+clip_end_s = 6
 
 clip_start = int(clip_start_s * vid_fps)
 clip_end = int(clip_end_s * vid_fps)
@@ -385,7 +385,7 @@ for frame_idx in range(clip_start, clip_end + 1):
 
     if frame_idx == clip_start:
 
-        cv2.imwrite("frame.png", frame)
+        cv2.imwrite("./Export/frame.png", frame)
 
         #################### (Section) Perspective
         
@@ -566,7 +566,7 @@ for frame_idx in range(clip_start, clip_end + 1):
             ax.set_axis_off()
             fig.add_axes(ax)
             seaborn.heatmap(heatmap_matrix, cbar = False)
-            plt.savefig("./heatmap.png")
+            plt.savefig("./Export/heatmap.png")
 
     cv2.imwrite(f"./Export/3D_{frame_idx}.png", frame)
     cv2.imwrite(f"./Export/2D_{frame_idx}.png", bird_image)
@@ -586,10 +586,10 @@ ax = plt.Axes(fig, [0., 0., 1., 1.])
 ax.set_axis_off()
 fig.add_axes(ax)
 seaborn.heatmap(heatmap_matrix, cbar = False)
-plt.savefig("./heatmap.png")
+plt.savefig("./Export/heatmap.png")
 
-combined = cv2.addWeighted(cv2.imread("./heatmap.png"), 0.5, cv2.imread("./frame.png"), 0.5, 0)
+combined = cv2.addWeighted(cv2.imread("./Export/heatmap.png"), 0.5, cv2.imread("./Export/frame.png"), 0.5, 0)
 
-cv2.imwrite("./combined.png", combined)
+cv2.imwrite("./Export/combined.png", combined)
 cv2.imshow('Heatmap', combined)
 cv2.waitKey(0)
