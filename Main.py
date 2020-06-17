@@ -316,8 +316,8 @@ vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
 ########## (Subsection) Choose clip region
 
-clip_start_s = 0
-clip_end_s = 10
+clip_start_s = 5
+clip_end_s = 15
 
 clip_start = int(clip_start_s * vid_fps)
 clip_end = int(clip_end_s * vid_fps)
@@ -567,6 +567,9 @@ for frame_idx in range(clip_start, clip_end + 1):
             fig.add_axes(ax)
             seaborn.heatmap(heatmap_matrix, cbar = False)
             plt.savefig("./heatmap.png")
+
+    cv2.imwrite(f"./Export/3D_{frame_idx}.png", frame)
+    cv2.imwrite(f"./Export/2D_{frame_idx}.png", bird_image)
 
 end_time = datetime.now()
 print(''), print(colored('...','white')), print(''), print(f'Ended at {end_time.strftime("%H:%M:%S")} ({end_time-start_time})'),print(''), print(colored('...','white')), print('')
