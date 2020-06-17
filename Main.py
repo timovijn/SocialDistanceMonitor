@@ -358,13 +358,13 @@ SOLID_BACK_COLOR = material.gray(shade=90)
 
 ########## (Subsection) Setup video writer
 
-height = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-width = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-fourcc = cv2.VideoWriter_fourcc(*"XVID")
-output_movie = cv2.VideoWriter("Pedestrian_detect.avi", fourcc, vid_fps, (width, height))
-bird_movie = cv2.VideoWriter(
-    "Pedestrian_bird.avi", fourcc, vid_fps, (int(width * scale_w), int(height * scale_h))
-)
+# height = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+# width = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+# fourcc = cv2.VideoWriter_fourcc(*"XVID")
+# output_movie = cv2.VideoWriter("Pedestrian_detect.avi", fourcc, vid_fps, (width, height))
+# bird_movie = cv2.VideoWriter(
+#     "Pedestrian_bird.avi", fourcc, vid_fps, (int(width * scale_w), int(height * scale_h))
+# )
 
 #################### (Section) Start
 
