@@ -30,7 +30,7 @@ To go from idea to a working tool, inspiration was taken from existing variants 
 
 - Landing AI, a famous start-up in the field of Artificial Intelligence, built a [social distancing detector](https://landing.ai/landing-ai-creates-an-ai-tool-to-help-customers-monitor-social-distancing-in-the-workplace/). The detector works roughly the same as the one presented in this blog post, as they use the video surveillance input, detect pedestrians and evaluate the social distancing violations from a bird's-eye perspective. Where the algorithms differ is in the sense of object detection. Landing AI uses Faster R-CNN, where our program uses YOLOv3, which will be explained later. Landing AI's tool does only show the violations as opposed by our tool, where the locations of occurrence are also given as output. This is where our program provides novel insights.
 - Aqeel Anwar also came up with a [likewise tool](https://towardsdatascience.com/monitoring-social-distancing-using-ai-c5b81da44c9f), again using the bird's eye perspective to measure the violations of social distancing. His implementation of transforming the perspective to bird's eye view was used as basis for the tool in this post. A limitation in his work is the way the distance between identified persons is calculated. This problem is addressed in the method section.
-- Lastly, a [social-distancing-analyser](https://github.com/Ank-Cha/Social-Distancing-Analyser-COVID-19) by Ankush Chaudhari was used as inspiration for our algrorithm. The way the YOLO neural net in implemented is equal to that of this blog post. This implementation does not make use of bird's eye view and thus makes up for a interesting comparison to the other implementations including that proposed this post. Finally, the
+- Lastly, a [social-distancing-analyser](https://github.com/Ank-Cha/Social-Distancing-Analyser-COVID-19) by Ankush Chaudhari was used as inspiration for our algorithm. The way the YOLO neural net in implemented is equal to that of this blog post. This implementation does not make use of bird's eye view and thus makes up for a interesting comparison to the other implementations including that proposed this post.
 
 ### Underlying Principles
 
@@ -53,17 +53,11 @@ When we descend into a more detailed level, the algorithm’s phases shown in th
 
 [Untitled](https://www.notion.so/5f97ba769d9b47269c82fdce862f66bb)
 
-- **Table**
+![Social%20Distance%20Monitor%207d35bd1776c6429bb1f55d258b90a908/Block_diagram_phases.png](Social%20Distance%20Monitor%207d35bd1776c6429bb1f55d258b90a908/Block_diagram_phases.png)
 
-    ```markdown
-    | Input | Phase | Output |
-    |-------------------------|-------------------------|---------------------------------|
-    | Raw video footage → | (1) Video processing | → Processed video frame |
-    | Processed video frame → | (2) Object detection | → Person locations (3D) |
-    | Person locations (3D) → | (3) Perspective change | → Person locations (2D) |
-    | Person locations (2D) → | (4) Violation detection | → Violations |
-    | Violations → | (5) Indicators | → Indicators and visualisations |
-    ```
+Block diagram indicating the individual phases of the Social Distance Monitor
+
+[Using Python to Monitor Social Distancing in a Public Area](https://towardsdatascience.com/monitoring-social-distancing-using-ai-c5b81da44c9f)
 
 ### (Phase 1) **Video processing**
 
@@ -142,7 +136,17 @@ One of the most informative visualisations is that of the Violation Heatmap, whi
 
 ## Data
 
-In order to build the social distance monitor a variety of data was used. First of all, the input of the program is a video (mostly from surveillance cameras). For these video inputs footage from a variety of d
+### Input Data
+
+In order to build the social distance monitor a variety of data was used. First of all, the input of the program is a video (mostly from surveillance cameras). For these videos as input data, footage from a variety of video datasets was used. The goal was to select a range of videos with differing characteristics such as lighting, amount of pedestrians, perspectives and surrounding objects in the environment. The selection of these videos was done manually with careful consideration. Footage from the following datasets was used: [Oxford Town Centre](https://megapixels.cc/oxford_town_centre/), [CAVIAR](http://homepages.inf.ed.ac.uk/rbf/CAVIARDATA1/), [Virat Video Dataset](https://viratdata.org/), [EPFL](https://www.epfl.ch/labs/cvlab/data/data-pom-index-php/) and an additional test video was provided by [BriefCam](https://www.youtube.com/watch?v=aUdKzb4LGJI). 
+
+### Data for object detection
+
+As this is the data used as input of the program, it is not used in building the tool. For the different phases, different datasets were used to be able to get an accurate and working tool. For person recognition, this can be split up in two parts, being the data used for the pre-trained weights of the YOLO network and the data used for the self-trained YOLO network. 
+
+The **COCO-dataset** was used to train and craft the original YOLO network
+
+For the custom self-trained variant of the YOLO network, the **Caltech dataset** was introduced
 
 ## Performance and robustness experiments
 
@@ -152,7 +156,7 @@ A number experiments that give an indication of the performance and robustness o
 
 Downscale a video to a lower resolution. Run SDM for the original video and downscaled video for the exact same frames.
 
-The hypothesis for this experiment is that the person detection will suffer somewhat from downscaling the video, and more with decreased resolution. Other aspects of the SDM have no further dependency on the resolution of the clip. Social distance monitoring is thus expected to have decreased accuracy due to incorrect recognition of persons.
+The hypothesis for this experiment is that the person detection will suffer somewhat from downscaling the video, and more with decreased resolution. Other aspects of the SDM have no further dependency on the resolution of the clip. Social distance identification is thus expected to have decreased accuracy due to incorrect recognition of persons.
 
 (...)
 
@@ -160,7 +164,7 @@ The hypothesis for this experiment is that the person detection will suffer some
 
 Record two videos of same scene, from different height perspectives. Run SDM for both videos.
 
-The hypothesis for this experiment is that the person detection will be exactly the same for both clips, as long as both clips are recorded at a reasonable camera height. The perspective transformation is expected to be of a lower accuracy for the clip that has been recorded at a lower height. Therefore, the social distance monitoring is expected to have decreased accuracy due to reduced accuracy in the phase of perspective transformation.
+The hypothesis for this experiment is that the person detection will be exactly the same for both clips, as long as both clips are recorded at a reasonable camera height. The perspective transformation is expected to be of a lower accuracy for the clip that has been recorded at a lower height. Therefore, the social distance identification is expected to have decreased accuracy due to reduced accuracy in the phase of perspective transformation.
 
 (...)
 
@@ -173,6 +177,8 @@ It is expected that the set of people that are more in the back of the scene wil
 (...)
 
 ## Shortcomings
+
+As demonstrated in the experiments, the SDM has shortcomings with regard to perspective. The transformation from a 3D scene to a 2D scene introduces inaccuracies that ripple on in the social distance identification. (... Discuss how and why these inaccuracies arise ...)
 
 # Conclusion
 
@@ -188,7 +194,9 @@ Based upon our findings during the development of the Social Distance Monitor, w
 
 ### Couple detection (filtering)
 
-(...)
+Something that introduces a significant amount of noise in the resulting data is couples (or families) that are walking close to each other or even holding hands. Many restrictive measures do not limit the distance that such persons are allowed to have and they should thus not be identified as a violation.
+
+At this point, the SDM contains no procedure to ignore couples. Such a procedure would probably contain a methodology that ignores all violations between two people that have been in violation for at least an X amount of frames.
 
 ### Improved perspective
 
@@ -196,4 +204,4 @@ Based upon our findings during the development of the Social Distance Monitor, w
 
 ### Automatic perspective
 
-(...)
+At this point, the SDM has one step that severely limits the applicability of such a tool; the perspective of a scene has to be given manually. Introducing methodology to automatically detect the perspective of a scene would be essential before deploying such a tool on large scale. A limitation that related tools that omit the bird’s eye view altogether need not address.
