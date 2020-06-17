@@ -61,7 +61,10 @@ Block diagram indicating the individual phases of the Social Distance Monitor
 
 ![Phases](/Blog/Images/Phases.eps | width=100)
 
-![Phases](https://github.com/timovijn/SocialDistanceMonitor/Blog/Images/SocialDistanceMonitor.gif?raw=true)
+![MovingOutput](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/MovingOutput.gif?raw=true)
+![Phases](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/Phases.eps?raw=true)
+
+
 
 ### (Phase 1) **Video processing**
 
