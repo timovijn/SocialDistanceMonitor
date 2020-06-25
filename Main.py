@@ -41,6 +41,9 @@ def get_mouse_points(event, x, y, flags, param):
         mouse_pts.append((x, y))
         print("Point marked")
         print(x,y)
+        # print(mouse_pts)
+    # mouse_pts = [(9, 232), (695, 395), (462, 25), (836, 65), (397, 266), (399, 204), (616, 338)]
+        
 
 def heatmap(dd):
     for violation in range(len(dd[0])):
@@ -303,21 +306,27 @@ print(''), print(colored('...','white')), print(''), print('Started at', start_t
 
 ########## (Subsection) Choose video
 
-# vid_path = "./video.mp4"
+# vid_path = "./Videos/video.mp4"
 # vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
 # vid_path = "./Videos/Delft.MOV"
 vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
 # vid_path = "./Videos/Rosmalen.MOV"
+# vid_path = "./Videos/TownCentreXVID_240.mp4"
+# vid_path = "./Videos/TownCentreXVID_480.m4v"
+# vid_path = "./Videos/TownCentreXVID_960.m4v"
+# vid_path = "./Videos/TownCentreXVID_1920.m4v"
+# vid_path = "./Videos/Training.mov"
+
 
 vid_cap = cv2.VideoCapture(vid_path)
 vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
 ########## (Subsection) Choose clip region
 
-clip_start_s = 5
-clip_end_s = 6
+clip_start_s = 0
+clip_end_s = 5
 
 clip_start = int(clip_start_s * vid_fps)
 clip_end = int(clip_end_s * vid_fps)
@@ -428,8 +437,24 @@ for frame_idx in range(clip_start, clip_end + 1):
     confid = 0.5
     thresh = 0.5
 
-    wgt_path = "./Yolo/yolov3.weights"
-    cfg_path = "./Yolo/yolov3.cfg"
+    # wgt_path = "./Yolo/yolov3_brunotimo_5000.weights"
+    # cfg_path = "./Yolo/yolov3_brunotimo.cfg"
+    
+    # wgt_path = "./Yolo/yolov3_brunotimo_10000.weights"
+    # cfg_path = "./Yolo/yolov3_brunotimo.cfg"
+
+    # wgt_path = "./Yolo/yolov3_brunotimo_44000.weights"
+    # cfg_path = "./Yolo/yolov3_brunotimo.cfg"
+    
+    # wgt_path = "./Yolo/yolov3_brunotimo_975.weights"
+    # cfg_path = "./Yolo/yolov3_brunotimo.cfg"
+    
+    # wgt_path = "./Yolo/yolov3.weights"
+    # cfg_path = "./Yolo/yolov3.cfg"
+
+    wgt_path = "./Yolo/yolo-inria_2000.weights"
+    cfg_path = "./Yolo/yolo-inria.cfg"
+
     labelsPath = "./Yolo/coco.names"
 
     net = cv2.dnn.readNetFromDarknet(cfg_path, wgt_path)
@@ -478,22 +503,24 @@ for frame_idx in range(clip_start, clip_end + 1):
                     classIDs.append(classID)
     
     idxs = cv2.dnn.NMSBoxes(boxes, confidences, confid, thresh)
-    boxes = np.array(boxes)[idxs.flatten()]
-    boxes2 = np.array(boxes2)[idxs.flatten()]
-    boxes_norm = np.array(boxes_norm)[idxs.flatten()]
-    boxes_norm2 = np.array(boxes_norm2)[idxs.flatten()]
-    confidences = np.array(confidences)[idxs.flatten()]
-    classIDs = np.array(classIDs)[idxs.flatten()]
 
-    print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Object detection')
-    print(''),print(colored('...','white')),print(''),print('Confidences:', [round(num, 2) for num in confidences])
+    centers = [] 
 
     if len(idxs) > 0:
+        boxes = np.array(boxes)[idxs.flatten()]
+        boxes2 = np.array(boxes2)[idxs.flatten()]
+        boxes_norm = np.array(boxes_norm)[idxs.flatten()]
+        boxes_norm2 = np.array(boxes_norm2)[idxs.flatten()]
+        confidences = np.array(confidences)[idxs.flatten()]
+        classIDs = np.array(classIDs)[idxs.flatten()]
+
+        print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Object detection')
+        print(''),print(colored('...','white')),print(''),print('Confidences:', [round(num, 2) for num in confidences])
+
         status = []
         idf = idxs.flatten()
         close_pair = []
         s_close_pair = []
-        centers = [] 
         co_info = []
         X = []
         Y = []
@@ -518,9 +545,10 @@ for frame_idx in range(clip_start, clip_end + 1):
         for i in range(0, len(idf)):
             cv2.rectangle(
                 frame, (X[i], Y[i]), (X[i] + W[i], Y[i] + H[i]), (0, 0, 150), 2)
-        cv2.imshow('Person recognition', frame)
-        cv2.waitKey(1)
     
+    cv2.imshow('Person recognition', frame)
+    cv2.waitKey(1)
+        
     print('Centers:', centers)
 
     pts = np.array(
