@@ -306,11 +306,13 @@ print(''), print(colored('...','white')), print(''), print('Started at', start_t
 
 ########## (Subsection) Choose video
 
-# vid_path = "./Videos/video.mp4"
+vid_path = []
+
+vid_path = "./Videos/video.mp4"
 # vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
 # vid_path = "./Videos/terrace1-c0.avi"
 # vid_path = "./Videos/Delft.MOV"
-vid_path = "./Videos/TownCentreXVID.avi"
+# vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/WalkByShop1cor.mpg"
 # vid_path = "./Videos/Rosmalen.MOV"
 # vid_path = "./Videos/TownCentreXVID_240.mp4"
@@ -318,19 +320,24 @@ vid_path = "./Videos/TownCentreXVID.avi"
 # vid_path = "./Videos/TownCentreXVID_960.m4v"
 # vid_path = "./Videos/TownCentreXVID_1920.m4v"
 # vid_path = "./Videos/Training.mov"
+# vid_path = "./Images/Video.avi"
 
+distance_detection = False
 
 vid_cap = cv2.VideoCapture(vid_path)
 vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
 ########## (Subsection) Choose clip region
-
-clip_start_s = 0
-clip_end_s = 5
+    
+clip_start_s = 10
+clip_end_s = 12
 
 clip_start = int(clip_start_s * vid_fps)
 clip_end = int(clip_end_s * vid_fps)
+# clip_end = int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
 clip_duration = clip_end - clip_start + 1
+
 
 ########## (Subsection) Print video information
 
@@ -394,43 +401,45 @@ for frame_idx in range(clip_start, clip_end + 1):
 
     if frame_idx == clip_start:
 
-        cv2.imwrite("./Export/frame.png", frame)
+        if distance_detection == True:
 
-        #################### (Section) Perspective
-        
-        print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Perspective')
-        print(''),print(colored('...','white')),print(''),print('Mark (Bottom left) → (Bottom right) → (Top left) → (Top right)'),print(''),print(colored('...','white')),print('')
-        
-        ########## (Subsection) Ask user to mark parallel points and two points 6 feet apart. Order bl, br, tr, tl, p1, p2
+            cv2.imwrite("./Export/frame.png", frame)
 
-        while True:
-            cv2.imshow("Perspective", frame)
-            cv2.waitKey(1)
-            if len(mouse_pts) == 7:
-                cv2.destroyWindow("Perspective")
-                break
-            first_frame_display = False
-        four_points = mouse_pts
+            #################### (Section) Perspective
+            
+            print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Perspective')
+            print(''),print(colored('...','white')),print(''),print('Mark (Bottom left) → (Bottom right) → (Top left) → (Top right)'),print(''),print(colored('...','white')),print('')
+            
+            ########## (Subsection) Ask user to mark parallel points and two points 6 feet apart. Order bl, br, tr, tl, p1, p2
 
-        ########## (Subsection) Get perspective
+            while True:
+                cv2.imshow("Perspective", frame)
+                cv2.waitKey(1)
+                if len(mouse_pts) == 7:
+                    cv2.destroyWindow("Perspective")
+                    break
+                first_frame_display = False
+            four_points = mouse_pts
 
-        M, Minv = get_camera_perspective(frame, four_points[0:4])
-        pts = src = np.float32(np.array([four_points[4:]]))
-        warped_pt = cv2.perspectiveTransform(pts, M)[0]
-        d_thresh = np.sqrt(
-            (warped_pt[0][0] - warped_pt[1][0]) ** 2
-            + (warped_pt[0][1] - warped_pt[1][1]) ** 2
-        )
-        bird_height = frame_h * scale_h
-        bird_width = frame_w * scale_w
-        bird_image = np.zeros(
-            (int(bird_height), int(bird_width), 3), np.uint8
-        )
+            ########## (Subsection) Get perspective
 
-        bird_image[:] = SOLID_BACK_COLOR
-        pedestrian_detect = frame
+            M, Minv = get_camera_perspective(frame, four_points[0:4])
+            pts = src = np.float32(np.array([four_points[4:]]))
+            warped_pt = cv2.perspectiveTransform(pts, M)[0]
+            d_thresh = np.sqrt(
+                (warped_pt[0][0] - warped_pt[1][0]) ** 2
+                + (warped_pt[0][1] - warped_pt[1][1]) ** 2
+            )
+            bird_height = frame_h * scale_h
+            bird_width = frame_w * scale_w
+            bird_image = np.zeros(
+                (int(bird_height), int(bird_width), 3), np.uint8
+            )
 
-        print(''),print(colored('...','white')),print(''),print(f'Threshold: {int(d_thresh)} px')
+            bird_image[:] = SOLID_BACK_COLOR
+            pedestrian_detect = frame
+
+            print(''),print(colored('...','white')),print(''),print(f'Threshold: {int(d_thresh)} px')
 
     #################### (Section) Object detection
 
@@ -452,7 +461,7 @@ for frame_idx in range(clip_start, clip_end + 1):
     # wgt_path = "./Yolo/yolov3.weights"
     # cfg_path = "./Yolo/yolov3.cfg"
 
-    wgt_path = "./Yolo/yolo-inria_2000.weights"
+    wgt_path = "./Yolo/yolo-inria_2500.weights"
     cfg_path = "./Yolo/yolo-inria.cfg"
 
     labelsPath = "./Yolo/coco.names"
@@ -551,53 +560,57 @@ for frame_idx in range(clip_start, clip_end + 1):
         
     print('Centers:', centers)
 
-    pts = np.array(
-        [four_points[0], four_points[1], four_points[3], four_points[2]], np.int32
-    )
-    cv2.polylines(frame, [pts], True, (0, 255, 255), thickness=4)
+    if distance_detection == True:
+
+        pts = np.array(
+            [four_points[0], four_points[1], four_points[3], four_points[2]], np.int32
+        )
+        cv2.polylines(frame, [pts], True, (0, 255, 255), thickness=4)
 
     pedestrian_boxes = boxes_norm2
     num_pedestrians = len(boxes_norm2)
 
+    if distance_detection == True:
+
     ########## (Subsection) Detect person and bounding boxes using DNN
 
-    if len(pedestrian_boxes) > 0:
+        if len(pedestrian_boxes) > 0:
 
-        print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing'), print(''), print(colored('...','white')), print('')
-        
-        warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix, frame = plot_points_on_bird_eye_view(
-            frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh, heatmap_matrix, bird_height, bird_width
-        )
+            print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing'), print(''), print(colored('...','white')), print('')
+            
+            warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix, frame = plot_points_on_bird_eye_view(
+                frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh, heatmap_matrix, bird_height, bird_width
+            )
 
-        num_violations_cumulative += num_violations
-        num_pedestrians_cumulative += num_pedestrians
+            num_violations_cumulative += num_violations
+            num_pedestrians_cumulative += num_pedestrians
 
-        heatmap(dd)
+            heatmap(dd)
 
-        print(f'Pedestrians: {num_pedestrians} ({num_pedestrians_cumulative})')
-        print(f'Pairs: {pairs}')
-        print(f'Violating pairs: {dd}')
-        print(f'Violations: {num_violations} ({num_violations_cumulative})')
+            print(f'Pedestrians: {num_pedestrians} ({num_pedestrians_cumulative})')
+            print(f'Pairs: {pairs}')
+            print(f'Violating pairs: {dd}')
+            print(f'Violations: {num_violations} ({num_violations_cumulative})')
 
-        print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing performance'), print(''), print(colored('...','white')), print('')
-        print(f'Frames: {frame_num}')
-        print(f'Violations: {round(num_violations_cumulative/frame_num,1)}')
-        print(f'Pedestrians: {round(num_pedestrians_cumulative/frame_num,1)}')
+            print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing performance'), print(''), print(colored('...','white')), print('')
+            print(f'Frames: {frame_num}')
+            print(f'Violations: {round(num_violations_cumulative/frame_num,1)}')
+            print(f'Pedestrians: {round(num_pedestrians_cumulative/frame_num,1)}')
 
-        if ((frame_num % 10 == 0) and (frame_num > 0)):
-            print('print')
-            fig = plt.figure(figsize=(1, 1))
-            dpi = fig.get_dpi()
-            plt.close()
-            fig = plt.figure(figsize=(frame_w/float(dpi),frame_h/float(dpi)))
-            ax = plt.Axes(fig, [0., 0., 1., 1.])
-            ax.set_axis_off()
-            fig.add_axes(ax)
-            seaborn.heatmap(heatmap_matrix, cbar = False)
-            plt.savefig("./Export/heatmap.png")
+            if ((frame_num % 10 == 0) and (frame_num > 0)):
+                print('print')
+                fig = plt.figure(figsize=(1, 1))
+                dpi = fig.get_dpi()
+                plt.close()
+                fig = plt.figure(figsize=(frame_w/float(dpi),frame_h/float(dpi)))
+                ax = plt.Axes(fig, [0., 0., 1., 1.])
+                ax.set_axis_off()
+                fig.add_axes(ax)
+                seaborn.heatmap(heatmap_matrix, cbar = False)
+                plt.savefig("./Export/heatmap.png")
 
-    cv2.imwrite(f"./Export/3D_{frame_idx}.png", frame)
-    cv2.imwrite(f"./Export/2D_{frame_idx}.png", bird_image)
+        cv2.imwrite(f"./Export/3D_{frame_idx}.png", frame)
+        cv2.imwrite(f"./Export/2D_{frame_idx}.png", bird_image)
 
 end_time = datetime.now()
 print(''), print(colored('...','white')), print(''), print(f'Ended at {end_time.strftime("%H:%M:%S")} ({end_time-start_time})'),print(''), print(colored('...','white')), print('')
