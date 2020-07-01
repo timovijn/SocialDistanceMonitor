@@ -3,7 +3,7 @@
 ########################################
 ########################################
 # Bruno Martens & Timo Vijn
-# Social Distancing
+# Social Distance Monitor
 ########################################
 ########################################
 ########################################
@@ -26,10 +26,52 @@ from tkinter import Tk
 from scipy.spatial.distance import pdist, squareform
 import seaborn
 from PIL import Image
+import PySimpleGUI as sg
+from simple_term_menu import TerminalMenu
 
-#################### (Section) Figures
+#################### (Section) User settings
 
-########## (Subsection) Define clicking function
+########## (Subsection) Choose video
+
+vid_paths = []
+
+vid_paths = [
+    "./Videos/video.mp4",
+    "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4",
+    "./Videos/terrace1-c0.avi",
+    "./Videos/Delft.MOV",
+    "./Videos/TownCentreXVID.avi",
+    "./Videos/WalkByShop1cor.mpg",
+    "./Videos/Rosmalen.MOV",
+    "./Videos/TownCentreXVID_240.mp4",
+    "./Videos/TownCentreXVID_480.m4v",
+    "./Videos/TownCentreXVID_960.m4v",
+    "./Videos/TownCentreXVID_1920.m4v",
+    "./Videos/Training.mov",
+    "./Videos/INRIA_Train.avi",
+    "./Videos/INRIA_Test.avi"
+]
+
+print(''), print(colored('...','white')), print(''), print('Choose video'), print('')
+terminal_menu = TerminalMenu(vid_paths)
+choice_index = terminal_menu.show()
+vid_path = vid_paths[choice_index]
+print(f'{vid_paths[choice_index]}'), print('')
+
+########## (Subsection) Set distance detection
+
+print('Distance detection?'), print('')
+terminal_menu = TerminalMenu(["True", "False"])
+choice_index = terminal_menu.show()
+if choice_index == 0:
+    distance_detection = True
+else:
+    distance_detection = False
+print(f'{distance_detection}')
+
+#################### (Section) Functions
+
+########## (Subsection) Perspective clicking function
 
 def get_mouse_points(event, x, y, flags, param):
     global mouse_x, mouse_y, mouse_pts
@@ -41,9 +83,8 @@ def get_mouse_points(event, x, y, flags, param):
         mouse_pts.append((x, y))
         print("Point marked")
         print(x,y)
-        # print(mouse_pts)
-    # mouse_pts = [(9, 232), (695, 395), (462, 25), (836, 65), (397, 266), (399, 204), (616, 338)]
         
+########## (Subsection) Heatmap function
 
 def heatmap(dd):
     for violation in range(len(dd[0])):
@@ -70,7 +111,7 @@ def heatmap(dd):
         
     return heatmap_matrix
 
-########## (Subsection) Define point function
+########## (Subsection) Plot points function
 
 def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_thresh,heatmap_matrix, bird_height, bird_width):
     frame_h = frame.shape[0]
@@ -205,23 +246,14 @@ def plot_points_on_bird_eye_view(frame, pedestrian_boxes, M, scale_w, scale_h,d_
                 width_classification = int(np.floor(interval*violation_pt_x/frame_w))
                 height_classification = int(np.floor(interval*violation_pt_y/frame_h))
 
-                # cv2.waitKey(0)
-                
-                # width_classification1 = int(np.floor(interval*original_pt1[0]/frame_w))
-                # height_classification1 = int(np.floor(interval*original_pt1[1]/frame_h))
-
-                # width_classification2 = int(np.floor(interval*original_pt2[0]/frame_w))
-                # height_classification2 = int(np.floor(interval*original_pt2[1]/frame_h))
-
-                # heatmap_matrix[height_classification, width_classification] += 1
-                # heatmap_matrix[height_classification2, width_classification2] += 1
-                # print(heatmap_matrix)
     cv2.imshow('Person recognition', frame)
     cv2.imshow("Bird's-eye view", bird_image)
     cv2.moveWindow("Bird's-eye view", int(screen_width/2), 0)
     cv2.waitKey(1)
 
     return warped_pts, bird_image, pairs, num_violations, dd, heatmap_matrix, frame
+
+########## (Subsection) Perspective function
 
 def get_camera_perspective(img, src_points):
     IMAGE_H = img.shape[0]
@@ -234,66 +266,6 @@ def get_camera_perspective(img, src_points):
 
     return M, M_inv
 
-# def put_text(frame, text, text_offset_y=25):
-#     font_scale = 0.8
-#     font = cv2.FONT_HERSHEY_SIMPLEX
-#     rectangle_bgr = (35, 35, 35)
-#     (text_width, text_height) = cv2.getTextSize(
-#         text, font, fontScale=font_scale, thickness=1
-#     )[0]
-#     # set the text start position
-#     text_offset_x = frame.shape[1] - 400
-#     # make the coords of the box with a small padding of two pixels
-#     box_coords = (
-#         (text_offset_x, text_offset_y + 5),
-#         (text_offset_x + text_width + 2, text_offset_y - text_height - 2),
-#     )
-#     frame = cv2.rectangle(
-#         frame, box_coords[0], box_coords[1], rectangle_bgr, cv2.FILLED
-#     )
-#     frame = cv2.putText(
-#         frame,
-#         text,
-#         (text_offset_x, text_offset_y),
-#         font,
-#         fontScale=font_scale,
-#         color=(255, 255, 255),
-#         thickness=1,
-#     )
-
-#     return frame, 2 * text_height + text_offset_y
-
-
-# def calculate_stay_at_home_index(total_pedestrians_detected, frame_num, fps):
-#     normally_people = 10
-#     pedestrian_per_sec = np.round(total_pedestrians_detected / frame_num, 1)
-#     sh_index = 1 - pedestrian_per_sec / normally_people
-#     return pedestrian_per_sec, sh_index
-
-
-# def plot_pedestrian_boxes_on_image(frame, pedestrian_boxes):
-#     frame_h = frame.shape[0]
-#     frame_w = frame.shape[1]
-#     thickness = 2
-#     # node_color = (192, 133, 156)
-#     node_color = (160, 48, 112)
-#     # color_10 = (80, 172, 110)
-
-#     for i in range(len(pedestrian_boxes)):
-#         pt1 = (
-#             int(pedestrian_boxes[i][1] * frame_w),
-#             int(pedestrian_boxes[i][0] * frame_h),
-#         )
-#         pt2 = (
-#             int(pedestrian_boxes[i][3] * frame_w),
-#             int(pedestrian_boxes[i][2] * frame_h),
-#         )
-
-#         frame_with_boxes = cv2.rectangle(frame, pt1, pt2, node_color, thickness)
-
-
-#     return frame_with_boxes
-
 ########## (Subsection) Grab screen dimensions
 
 screen_width = Tk().winfo_screenwidth()
@@ -304,45 +276,25 @@ screen_height = Tk().winfo_screenheight()
 start_time = datetime.now()
 print(''), print(colored('...','white')), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
 
-########## (Subsection) Choose video
-
-vid_path = []
-
-vid_path = "./Videos/video.mp4"
-# vid_path = "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4"
-# vid_path = "./Videos/terrace1-c0.avi"
-# vid_path = "./Videos/Delft.MOV"
-# vid_path = "./Videos/TownCentreXVID.avi"
-# vid_path = "./Videos/WalkByShop1cor.mpg"
-# vid_path = "./Videos/Rosmalen.MOV"
-# vid_path = "./Videos/TownCentreXVID_240.mp4"
-# vid_path = "./Videos/TownCentreXVID_480.m4v"
-# vid_path = "./Videos/TownCentreXVID_960.m4v"
-# vid_path = "./Videos/TownCentreXVID_1920.m4v"
-# vid_path = "./Videos/Training.mov"
-# vid_path = "./Images/Video.avi"
-
-distance_detection = False
-
 vid_cap = cv2.VideoCapture(vid_path)
 vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
-
-########## (Subsection) Choose clip region
-    
-clip_start_s = 10
-clip_end_s = 12
-
-clip_start = int(clip_start_s * vid_fps)
-clip_end = int(clip_end_s * vid_fps)
-# clip_end = int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))
-
-clip_duration = clip_end - clip_start + 1
-
 
 ########## (Subsection) Print video information
 
 print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Initialisation')
 print(''), print(colored('...','white')), print(''), print('Path: {}'.format(vid_path)), print('Width: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH)))), print('Height: {} px'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))), print('Framerate: {} fps'.format(vid_fps)), print('Duration: {} s'.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))), print('Frames: {}'.format(int(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))))
+
+########## (Subsection) Choose clip region
+
+print(''), print('Clip start?'), print('')
+clip_start_s = float(input('Insert float between (0) s and ({}) s '.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))))
+print(''), print('Clip end?'), print('')
+clip_end_s = float(input('Insert float between ({}) s and ({}) s '.format(clip_start_s, round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))))
+
+clip_start = int(clip_start_s * vid_fps)
+clip_end = int(clip_end_s * vid_fps)
+
+clip_duration = clip_end - clip_start + 1
 
 ########## (Subsection) Initialise variables
 
@@ -395,6 +347,7 @@ for frame_idx in range(clip_start, clip_end + 1):
 
     vid_cap.set(1, frame_idx)
     (success, frame) = vid_cap.read()
+    
     (frame_h, frame_w) = frame.shape[:2]
     frame = cv2.resize(frame, (0, 0), fx=0.5*screen_width/frame_w, fy=0.5*screen_width/frame_w)
     (frame_h, frame_w) = frame.shape[:2]
@@ -443,7 +396,7 @@ for frame_idx in range(clip_start, clip_end + 1):
 
     #################### (Section) Object detection
 
-    confid = 0.5
+    confid = 0.25
     thresh = 0.5
 
     # wgt_path = "./Yolo/yolov3_brunotimo_5000.weights"
@@ -458,11 +411,11 @@ for frame_idx in range(clip_start, clip_end + 1):
     # wgt_path = "./Yolo/yolov3_brunotimo_975.weights"
     # cfg_path = "./Yolo/yolov3_brunotimo.cfg"
     
-    # wgt_path = "./Yolo/yolov3.weights"
-    # cfg_path = "./Yolo/yolov3.cfg"
+    wgt_path = "./Yolo/yolov3.weights"
+    cfg_path = "./Yolo/yolov3.cfg"
 
-    wgt_path = "./Yolo/yolo-inria_2500.weights"
-    cfg_path = "./Yolo/yolo-inria.cfg"
+    # wgt_path = "./Yolo/yolo-inria_10000.weights"
+    # cfg_path = "./Yolo/yolo-inria.cfg"
 
     labelsPath = "./Yolo/coco.names"
 

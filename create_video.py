@@ -4,12 +4,14 @@ import cv2
 from PIL import Image  
   
 # Checking the current directory path 
-print(os.getcwd())  
+print(os.getcwd())
   
 # Folder which contains all the images 
 # from which video is to be generated 
-os.chdir("./Images/")   
+os.chdir("./Images/INRIAPerson/Test/pos/")
+# os.system('clear')
 path = ""
+
   
 mean_height = 0
 mean_width = 0
@@ -20,7 +22,7 @@ num_of_images = len(os.listdir('.'))
 for file in sorted(os.listdir('.')):
     if file.endswith(".DS_Store"): 
         continue
-    im = Image.open(os.path.join(path, file)) 
+    im = Image.open(os.path.join(path, file))
     width, height = im.size 
     mean_width += width 
     mean_height += height 
