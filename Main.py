@@ -28,6 +28,7 @@ import seaborn
 from PIL import Image
 import PySimpleGUI as sg
 from simple_term_menu import TerminalMenu
+import time
 
 #################### (Section) User settings
 
@@ -36,7 +37,7 @@ from simple_term_menu import TerminalMenu
 vid_paths = []
 
 vid_paths = [
-    "./Videos/video.mp4",
+    "./Videos/virat.mp4",
     "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4",
     "./Videos/terrace1-c0.avi",
     "./Videos/Delft.MOV",
@@ -83,6 +84,7 @@ def get_mouse_points(event, x, y, flags, param):
         mouse_pts.append((x, y))
         print("Point marked")
         print(x,y)
+    mouse_pts = [(462, 25), (9, 232), (836, 65), (695, 395), (399, 240), (399, 204), (616, 338)]
         
 ########## (Subsection) Heatmap function
 
@@ -275,7 +277,6 @@ screen_height = Tk().winfo_screenheight()
 
 start_time = datetime.now()
 print(''), print(colored('...','white')), print(''), print('Started at', start_time.strftime("%H:%M:%S"))
-
 vid_cap = cv2.VideoCapture(vid_path)
 vid_fps = vid_cap.get(cv2.CAP_PROP_FPS)
 
@@ -286,7 +287,7 @@ print(''), print(colored('...','white')), print(''), print('Path: {}'.format(vid
 
 ########## (Subsection) Choose clip region
 
-print(''), print('Clip start?'), print('')
+print(''), print('...'), print(''), print('Clip start?'), print('')
 clip_start_s = float(input('Insert float between (0) s and ({}) s '.format(round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))))
 print(''), print('Clip end?'), print('')
 clip_end_s = float(input('Insert float between ({}) s and ({}) s '.format(clip_start_s, round(vid_cap.get(cv2.CAP_PROP_FRAME_COUNT)/vid_fps,2))))
@@ -347,7 +348,7 @@ for frame_idx in range(clip_start, clip_end + 1):
 
     vid_cap.set(1, frame_idx)
     (success, frame) = vid_cap.read()
-    
+
     (frame_h, frame_w) = frame.shape[:2]
     frame = cv2.resize(frame, (0, 0), fx=0.5*screen_width/frame_w, fy=0.5*screen_width/frame_w)
     (frame_h, frame_w) = frame.shape[:2]
@@ -361,7 +362,7 @@ for frame_idx in range(clip_start, clip_end + 1):
             #################### (Section) Perspective
             
             print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Perspective')
-            print(''),print(colored('...','white')),print(''),print('Mark (Bottom left) → (Bottom right) → (Top left) → (Top right)'),print(''),print(colored('...','white')),print('')
+            print(''),print(colored('...','white')),print(''),print('Mark (Top left) → (Bottom left) → (Top right) → (Bottom right)'),print(''),print(colored('...','white')),print('')
             
             ########## (Subsection) Ask user to mark parallel points and two points 6 feet apart. Order bl, br, tr, tl, p1, p2
 
@@ -396,7 +397,14 @@ for frame_idx in range(clip_start, clip_end + 1):
 
     #################### (Section) Object detection
 
-    confid = 0.25
+    obj_start_time = []
+    obj_end_time = []
+    vio_start_time = []
+    vio_end_time = []
+
+    obj_start_time.append(time.time())
+
+    confid = 0.1
     thresh = 0.5
 
     # wgt_path = "./Yolo/yolov3_brunotimo_5000.weights"
@@ -476,7 +484,6 @@ for frame_idx in range(clip_start, clip_end + 1):
         confidences = np.array(confidences)[idxs.flatten()]
         classIDs = np.array(classIDs)[idxs.flatten()]
 
-        print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Object detection')
         print(''),print(colored('...','white')),print(''),print('Confidences:', [round(num, 2) for num in confidences])
 
         status = []
@@ -509,6 +516,7 @@ for frame_idx in range(clip_start, clip_end + 1):
                 frame, (X[i], Y[i]), (X[i] + W[i], Y[i] + H[i]), (0, 0, 150), 2)
     
     cv2.imshow('Person recognition', frame)
+    # cv2.imwrite(f"./frame.png", frame)
     cv2.waitKey(1)
         
     print('Centers:', centers)
@@ -523,7 +531,13 @@ for frame_idx in range(clip_start, clip_end + 1):
     pedestrian_boxes = boxes_norm2
     num_pedestrians = len(boxes_norm2)
 
+    print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Object detection')
+
+    obj_end_time.append(time.time())
+
     if distance_detection == True:
+
+        vio_start_time.append(time.time())
 
     ########## (Subsection) Detect person and bounding boxes using DNN
 
@@ -547,8 +561,8 @@ for frame_idx in range(clip_start, clip_end + 1):
 
             print(''), print(colored('...','white')), print(''), print(colored('Checkpoint', 'blue'),'Social distancing performance'), print(''), print(colored('...','white')), print('')
             print(f'Frames: {frame_num}')
-            print(f'Violations: {round(num_violations_cumulative/frame_num,1)}')
-            print(f'Pedestrians: {round(num_pedestrians_cumulative/frame_num,1)}')
+            print(f'Violations (average): {round(num_violations_cumulative/frame_num,1)}')
+            print(f'Pedestrians (average): {round(num_pedestrians_cumulative/frame_num,1)}')
 
             if ((frame_num % 10 == 0) and (frame_num > 0)):
                 print('print')
@@ -564,6 +578,13 @@ for frame_idx in range(clip_start, clip_end + 1):
 
         cv2.imwrite(f"./Export/3D_{frame_idx}.png", frame)
         cv2.imwrite(f"./Export/2D_{frame_idx}.png", bird_image)
+
+        vio_end_time.append(time.time())
+
+
+print(''), print(colored('...','white')), print('')
+print(f'Object detection took an average of ({np.sum([x - y for x, y in zip(obj_end_time, obj_start_time)])/len(obj_end_time)}) s'), print('')
+print(f'Violence detection took an average of ({np.sum([x - y for x, y in zip(vio_end_time, vio_start_time)])/len(vio_end_time)}) s')
 
 end_time = datetime.now()
 print(''), print(colored('...','white')), print(''), print(f'Ended at {end_time.strftime("%H:%M:%S")} ({end_time-start_time})'),print(''), print(colored('...','white')), print('')
