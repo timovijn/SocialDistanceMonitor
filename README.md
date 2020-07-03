@@ -108,13 +108,7 @@ To obtain (output) indicators from (input) violations, the algorithm contains a 
 
 One of the most informative visualisations is that of the Violation Heatmap, which exactly fits the original scene and can thus be overlaid as demonstrated by the right image below. To establish this heatmap, the centre-point of violation – that is, the point that is exactly in between two people that are in violation – is recorded as the violation’s location.
 
-![Copy%20of%20Social%20Distance%20Monitor%20ee86ab6fa90d43b19f9d3079463ff5ab/Heatmap.png](Copy%20of%20Social%20Distance%20Monitor%20ee86ab6fa90d43b19f9d3079463ff5ab/Heatmap.png)
-
-Violation Heatmap
-
-![Copy%20of%20Social%20Distance%20Monitor%20ee86ab6fa90d43b19f9d3079463ff5ab/HeatmapOverlay.png](Copy%20of%20Social%20Distance%20Monitor%20ee86ab6fa90d43b19f9d3079463ff5ab/HeatmapOverlay.png)
-
-Violation Heatmap overlaying a frame from the Oxford Town Centre
+| [![Heatmap](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/MovingOutput.gif?raw=true)](Violation Heatmap)  | [![HeatmapOverlay](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/HeatmapOverlay.png?raw=true)](http://audioblocks.com) |
 
 ![Heatmap](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/Heatmap.png?raw=true) ![HeatmapOverlay](https://github.com/timovijn/SocialDistanceMonitor/blob/master/Blog/Images/HeatmapOverlay.png?raw=true)
 *Violation Heatmap (left) and Violation Heatmap overlaying a frame from the Oxford Town Centre (right)*
