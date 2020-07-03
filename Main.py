@@ -32,16 +32,20 @@ import time
 
 #################### (Section) User settings
 
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
 ########## (Subsection) Choose video
 
 vid_paths = []
 
 vid_paths = [
+    "./Videos/TownCentreXVID.avi",
     "./Videos/virat.mp4",
     "./Videos/Pedestrian overpass - original video (sample) - BriefCam Syndex.mp4",
     "./Videos/terrace1-c0.avi",
     "./Videos/Delft.MOV",
-    "./Videos/TownCentreXVID.avi",
     "./Videos/WalkByShop1cor.mpg",
     "./Videos/Rosmalen.MOV",
     "./Videos/TownCentreXVID_240.mp4",
@@ -53,10 +57,12 @@ vid_paths = [
     "./Videos/INRIA_Test.avi"
 ]
 
+vid_paths = os.listdir('./Videos/')
+
 print(''), print(colored('...','white')), print(''), print('Choose video'), print('')
 terminal_menu = TerminalMenu(vid_paths)
 choice_index = terminal_menu.show()
-vid_path = vid_paths[choice_index]
+vid_path = f'./Videos/{vid_paths[choice_index]}'
 print(f'{vid_paths[choice_index]}'), print('')
 
 ########## (Subsection) Set distance detection
@@ -84,7 +90,7 @@ def get_mouse_points(event, x, y, flags, param):
         mouse_pts.append((x, y))
         print("Point marked")
         print(x,y)
-    mouse_pts = [(462, 25), (9, 232), (836, 65), (695, 395), (399, 240), (399, 204), (616, 338)]
+    # mouse_pts = [(462, 25), (9, 232), (836, 65), (695, 395), (399, 240), (399, 204), (616, 338)]
         
 ########## (Subsection) Heatmap function
 
@@ -576,8 +582,8 @@ for frame_idx in range(clip_start, clip_end + 1):
                 seaborn.heatmap(heatmap_matrix, cbar = False)
                 plt.savefig("./Export/heatmap.png")
 
-        cv2.imwrite(f"./Export/3D_{frame_idx}.png", frame)
-        cv2.imwrite(f"./Export/2D_{frame_idx}.png", bird_image)
+        # cv2.imwrite(f"./Export/3D_{frame_idx}.png", frame)
+        # cv2.imwrite(f"./Export/2D_{frame_idx}.png", bird_image)
 
         vio_end_time.append(time.time())
 
