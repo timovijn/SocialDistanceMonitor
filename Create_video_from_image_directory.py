@@ -1,3 +1,11 @@
+########################################
+
+# Bruno Martens & Timo Vijn
+# Create a video from an image directory
+# 01/07/2020
+
+########################################
+
 # importing libraries 
 import os 
 import cv2  
