@@ -75,6 +75,6 @@ tifffile==2020.6.3
 toml==0.10.0
 tornado==6.0.4
 tqdm @ file:///home/conda/feedstock_root/build_artifacts/tqdm_1588513834538/work
-urllib3==1.25.9
+urllib3==1.26.5
 Werkzeug==1.0.1
 wrapt==1.12.1
